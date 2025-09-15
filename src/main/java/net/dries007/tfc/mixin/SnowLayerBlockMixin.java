@@ -14,6 +14,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
@@ -32,6 +33,9 @@ import net.dries007.tfc.util.EnvironmentHelpers;
 import net.dries007.tfc.util.Helpers;
 import net.dries007.tfc.util.climate.Climate;
 import net.dries007.tfc.util.climate.OverworldClimateModel;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -49,7 +53,12 @@ public abstract class SnowLayerBlockMixin extends Block
     @Override
     public float getSpeedFactor()
     {
-        return TFCConfig.SERVER.enableSnowSlowEntities.get() ? 0.6f : 1.0f;
+        return TFCConfig.SERVER.enableSnowSlowEntities.get() ? 0.85f : 1.0f;
+    }
+
+    @Inject(method = " getCollisionShape", at = @At(value = "RETURN"), cancellable = true)
+    public void getCollisionShape(BlockState p_56625_, BlockGetter p_56626_, BlockPos p_56627_, CollisionContext p_56628_, CallbackInfoReturnable<VoxelShape> cir) {
+        cir.setReturnValue(Shapes.empty());
     }
 
     /**
