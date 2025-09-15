@@ -61,6 +61,8 @@ public abstract class OviparousAnimal extends ProducingAnimal implements Pluckab
     private long lastPlucked = Long.MIN_VALUE;
     private boolean crowed;
     private final boolean isCrowingBird;
+    @Nullable
+    private CompoundTag genes;
 
     public OviparousAnimal(EntityType<? extends OviparousAnimal> type, Level level, TFCSounds.EntitySound sounds, OviparousAnimalConfig config, boolean isCrowingBird)
     {
@@ -162,7 +164,38 @@ public abstract class OviparousAnimal extends ProducingAnimal implements Pluckab
         male.setLastFed(getLastFed() - 1);
         male.addUses(hatchDays.get());
         addUses(hatchDays.get()*2);
+
+        CompoundTag genes = new CompoundTag();
+        createGenes(genes, male);
+        setGenes(genes.isEmpty() ? null : genes);
+
     }
+
+    private void createGenes(CompoundTag tag, TFCAnimalProperties male)
+    {
+        tag.putInt("size", male.getGeneticSize() + getGeneticSize());
+        tag.putBoolean("runt", getEntity().getRandom().nextInt(20) == 0);
+    }
+
+    public void setGenes(@javax.annotation.Nullable CompoundTag tag)
+    {
+        genes = tag;
+    }
+
+    public CompoundTag getGenes()
+    {
+        return genes;
+    }
+
+    private void applyGenes(CompoundTag tag, MammalProperties baby)
+    {
+        baby.setGeneticSize(Mth.floor(EntityHelpers.getIntOrDefault(tag, "size", 16) / 2d + Mth.nextInt(baby.getEntity().getRandom(), -3, 3)));
+        if (tag.getBoolean("runt"))
+        {
+            baby.setGeneticSize(1);
+        }
+    }
+
 
     @Override
     public void tick()
@@ -297,6 +330,10 @@ public abstract class OviparousAnimal extends ProducingAnimal implements Pluckab
                     baby.setGender(Gender.valueOf(random.nextBoolean()));
                     baby.setBirthDay(Calendars.SERVER.getTotalDays());
                     baby.setFamiliarity(getFamiliarity());
+                    if (getGenes() != null)
+                    {
+                        applyGenes(getGenes(), (MammalProperties) baby);
+                    }
                     egg.setFertilized(baby, Calendars.SERVER.getTotalDays() + hatchDays.get());
                 }
             }
