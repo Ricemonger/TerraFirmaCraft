@@ -71,7 +71,7 @@ public abstract class ShortGrassBlock extends PlantBlock implements ISpecialPile
         super.randomTick(state, level, pos, random);
         if (PlantRegrowth.canSpread(level, random))
         {
-            final BlockPos newPos = PlantRegrowth.spreadSelf(state, level, pos, random, 2, 2, 4);
+            final BlockPos newPos = PlantRegrowth.spreadSelf(state, level, pos, random, 2, 1, 6);
             if (newPos != null)
             {
                 level.setBlockAndUpdate(newPos, updateStateWithCurrentMonth(state.setValue(AGE, 0)));

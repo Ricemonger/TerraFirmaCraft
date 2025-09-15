@@ -65,7 +65,7 @@ public abstract class TFCTallGrassBlock extends ShortGrassBlock implements ITall
         super.randomTick(state, level, pos, random);
         if (PlantRegrowth.canSpread(level, random) && state.getValue(PART) == Part.LOWER)
         {
-            final BlockPos newPos = PlantRegrowth.spreadSelf(state, level, pos, random, 2, 2, 4);
+            final BlockPos newPos = PlantRegrowth.spreadSelf(state, level, pos, random, 2, 1, 5);
             if (newPos != null && PlantRegrowth.DEFAULT_PLACEMENT_TEST.test(level.getBlockState(newPos.above()), newPos.above()))
             {
                 placeTwoHalves(level, newPos, 2, random);

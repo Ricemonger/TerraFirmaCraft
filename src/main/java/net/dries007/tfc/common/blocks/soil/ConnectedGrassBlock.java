@@ -153,6 +153,7 @@ public class ConnectedGrassBlock extends Block implements IGrassBlock
                 }
             }
             PlantRegrowth.placeRisingRock(level, pos.above(), random);
+            PlantRegrowth.placeShortGrass(level, pos.above(), random);
         }
     }
 
