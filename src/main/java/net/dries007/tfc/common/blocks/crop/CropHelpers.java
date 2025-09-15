@@ -42,7 +42,7 @@ public final class CropHelpers
 
     public static final float GROWTH_FACTOR = 1f / (24 * ICalendar.TICKS_IN_DAY);
     public static final float NUTRIENT_CONSUMPTION = 1f / (12 * ICalendar.TICKS_IN_DAY);
-    public static final float NUTRIENT_GROWTH_FACTOR = 0.5f;
+    public static final float NUTRIENT_GROWTH_FACTOR = 0.1f;
     public static final float GROWTH_LIMIT = 1f;
     public static final float EXPIRY_LIMIT = 2f;
     public static final float YIELD_MIN = 0.2f;
@@ -102,7 +102,8 @@ public final class CropHelpers
         final float localExpiryLimit = EXPIRY_LIMIT * expiryModifier * (1f / growthModifier);
 
         // Total growth is based on the ticks and the nutrients consumed. It is then allocated to actual growth or expiry based on other factors.
-        final float totalGrowthDelta = (1f / growthModifier) * Helpers.uniform(random, 0.9f, 1.1f) * tickDelta * CropHelpers.GROWTH_FACTOR + nutrientsConsumed * NUTRIENT_GROWTH_FACTOR;
+        final float totalGrowthDelta =
+            (1f / growthModifier) * Helpers.uniform(random, 0.9f, 1.1f) * tickDelta * CropHelpers.GROWTH_FACTOR + (nutrientsConsumed * NUTRIENT_GROWTH_FACTOR / growthModifier );
         final float initialGrowth = crop.getGrowth();
         float remainingGrowthDelta = totalGrowthDelta;
         float growth = initialGrowth, expiry = crop.getExpiry(), actualYield = crop.getYield();
