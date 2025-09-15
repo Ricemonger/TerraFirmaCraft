@@ -98,6 +98,9 @@ dependencies {
 
     // Only use Jade at runtime
     runtimeOnly(fg.deobf("curse.maven:jade-324717:${jadeVersion}"))
+    
+    implementation (fg.deobf("curse.maven:paragliders-289240:5046069"))
+
     // runtimeOnly(fg.deobf("curse.maven:top-245211:${topVersion}"))
 
     if (System.getProperty("idea.sync.active") != "true") {
