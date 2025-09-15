@@ -54,7 +54,7 @@ import net.dries007.tfc.util.calendar.ICalendar;
 public interface TFCAnimalProperties extends GenderedRenderAnimal, BrainBreeder
 {
     long MATING_COOLDOWN_DEFAULT_TICKS = ICalendar.TICKS_IN_DAY;
-    float READY_TO_MATE_FAMILIARITY = 0.3f;
+    float READY_TO_MATE_FAMILIARITY = 0.2f;
     float[] AGE_SCALES = Util.make(() -> {
         final float[] scales = new float[32];
         for (int i = 0; i < scales.length; i++)
@@ -133,14 +133,22 @@ public interface TFCAnimalProperties extends GenderedRenderAnimal, BrainBreeder
     {
         if (getLastFamiliarityDecay() > -1 && getLastFamiliarityDecay() + 1 < getCalendar().getTotalDays() && !getEntity().level().isClientSide)
         {
+            if(getAgeType() != Age.CHILD) {
+                addUses((int) (getCalendar().getTotalDays() - getLastFamiliarityDecay()));
+            }
+
             // Decay must only occur on server, as the last familiarity decay is not synced, so this produces invalid results on client
             float familiarity = getFamiliarity();
-            if (familiarity < TFCConfig.SERVER.familiarityDecayLimit.get())
+            if (familiarity > 0f)
             {
                 familiarity -= 0.02 * (getCalendar().getTotalDays() - getLastFamiliarityDecay());
-                setLastFamiliarityDecay(getCalendar().getTotalDays());
+
+                if(familiarity < 0f)
+                    familiarity = 0f;
+
                 this.setFamiliarity(familiarity);
             }
+            setLastFamiliarityDecay(getCalendar().getTotalDays());
         }
         final Age age = getAgeType();
         if (age != getLastAge())
@@ -223,7 +231,7 @@ public interface TFCAnimalProperties extends GenderedRenderAnimal, BrainBreeder
             }
             if (getAgeType() == Age.CHILD || getFamiliarity() < getAdultFamiliarityCap())
             {
-                float familiarity = getFamiliarity() + 0.06f;
+                float familiarity = getFamiliarity() + 0.04f;
                 if (getAgeType() != Age.CHILD)
                 {
                     familiarity = Math.min(familiarity, getAdultFamiliarityCap());
@@ -293,7 +301,7 @@ public interface TFCAnimalProperties extends GenderedRenderAnimal, BrainBreeder
         setBirthDay(EntityHelpers.getRandomGrowth(getEntity(), random, getDaysToAdulthood()));
         setFamiliarity(0);
         setOldDay(-1L);
-        setUses(0);
+        setUses((int)(getUsesToElderly() * random.nextDouble() * random.nextDouble()));
         setGeneticSize(Mth.nextInt(random, 4, 18));
         setFertilized(false);
         if (getEntity() instanceof AgeableMob mob)
@@ -449,14 +457,14 @@ public interface TFCAnimalProperties extends GenderedRenderAnimal, BrainBreeder
         setFertilized(true);
         setLastFed(getLastFed() - 1);
         male.setLastFed(getLastFed() - 1);
-        male.addUses(5); // wear out the male
+        //male.addUses(5); // wear out the male
     }
 
     default void setBabyTraits(TFCAnimalProperties baby)
     {
         baby.setGender(Gender.valueOf(getEntity().getRandom().nextBoolean()));
         baby.setBirthDay(Calendars.SERVER.getTotalDays());
-        baby.setFamiliarity(this.getFamiliarity() < 0.9F ? this.getFamiliarity() / 2.0F : this.getFamiliarity() * 0.9F);
+        baby.setFamiliarity(this.getFamiliarity());
     }
 
     @Nullable

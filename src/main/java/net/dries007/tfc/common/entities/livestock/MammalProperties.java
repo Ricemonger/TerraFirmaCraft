@@ -58,6 +58,9 @@ public interface MammalProperties extends TFCAnimalProperties
         {
             var random = entity.getRandom();
             final int kids = Mth.nextInt(random, 1, getChildCount());
+
+            addUses(((int)getGestationDays()/3) * kids);
+
             for (int i = 0; i < kids; i++)
             {
                 AgeableMob offspring = ageable.getBreedOffspring(server, ageable);
@@ -65,7 +68,7 @@ public interface MammalProperties extends TFCAnimalProperties
                 if (offspring instanceof MammalProperties animal)
                 {
                     offspring.setPos(entity.position());
-                    animal.setFamiliarity(getFamiliarity() < 0.9F ? getFamiliarity() / 2.0F : getFamiliarity() * 0.9F);
+                    animal.setFamiliarity(getFamiliarity());
                     server.addFreshEntity(offspring);
                 }
             }
@@ -84,6 +87,9 @@ public interface MammalProperties extends TFCAnimalProperties
         //Mark the day this female became pregnant
         TFCAnimalProperties.super.onFertilized(male); // setFertilized(true)
         setPregnantTime(getCalendar().getTotalDays());
+
+        male.addUses((int)getGestationDays()/3);
+        addUses((int)getGestationDays()/3);
 
         CompoundTag genes = new CompoundTag();
         createGenes(genes, male);

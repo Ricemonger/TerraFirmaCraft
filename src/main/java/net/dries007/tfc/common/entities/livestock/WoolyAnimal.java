@@ -51,7 +51,7 @@ public abstract class WoolyAnimal extends ProducingMammal implements IForgeShear
         playSound(SoundEvents.SHEEP_SHEAR, 1.0f, 1.0f);
 
         // if the event was not cancelled
-        AnimalProductEvent event = new AnimalProductEvent(level, pos, player, this, getWoolItem(), item, 1);
+        AnimalProductEvent event = new AnimalProductEvent(level, pos, player, this, getWoolItem(), item, 10);
         if (!MinecraftForge.EVENT_BUS.post(event))
         {
             addUses(event.getUses());
@@ -67,7 +67,8 @@ public abstract class WoolyAnimal extends ProducingMammal implements IForgeShear
 
     public ItemStack getWoolItem()
     {
-        final int amount = getFamiliarity() > 0.99f ? 2 : 1;
+        final int amount = getFamiliarity() > 0.99f && Math.random() > 0.66 ? 2 : 1;
+
         return new ItemStack(TFCItems.WOOL.get(), amount);
     }
 

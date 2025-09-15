@@ -48,7 +48,7 @@ public abstract class OviparousAnimal extends ProducingAnimal implements Pluckab
 {
     public static AttributeSupplier.Builder createAttributes()
     {
-        return Chicken.createAttributes().add(ForgeMod.STEP_HEIGHT_ADDITION.get(), 1.5);
+        return Chicken.createAttributes().add(ForgeMod.STEP_HEIGHT_ADDITION.get(), 0.0);
     }
 
     public float flapping = 1f;
@@ -109,6 +109,42 @@ public abstract class OviparousAnimal extends ProducingAnimal implements Pluckab
     }
 
     @Override
+    public void tickAnimalData()
+    {
+        if (getLastFamiliarityDecay() > -1 && getLastFamiliarityDecay() + 1 < getCalendar().getTotalDays() && !getEntity().level().isClientSide)
+        {
+            if(getAgeType() != Age.CHILD) {
+                addUses((int) (getCalendar().getTotalDays() - getLastFamiliarityDecay()));
+            }
+
+            // Decay must only occur on server, as the last familiarity decay is not synced, so this produces invalid results on client
+            float familiarity = getFamiliarity();
+            if (familiarity > 0f)
+            {
+                familiarity -= 0.02 * (getCalendar().getTotalDays() - getLastFamiliarityDecay());
+
+                if(familiarity < 0f)
+                    familiarity = 0f;
+
+                this.setFamiliarity(familiarity);
+            }
+            setLastFamiliarityDecay(getCalendar().getTotalDays());
+        }
+        final Age age = getAgeType();
+        if (age != getLastAge())
+        {
+            setLastAge(age);
+            getEntity().refreshDimensions();
+        }
+        // because this is a random value it's not deterministic, we will allow the entity to sync it on its own
+        if (!getEntity().level().isClientSide && age == Age.ADULT && getUses() > getUsesToElderly() && getOldDay() == -1L)
+        {
+            final long oldDay = getCalendar().getTotalDays();
+            setOldDay(oldDay);
+        }
+    }
+
+    @Override
     protected void customServerAiStep()
     {
         super.customServerAiStep();
@@ -116,6 +152,16 @@ public abstract class OviparousAnimal extends ProducingAnimal implements Pluckab
         {
             getJumpControl().jump();
         }
+    }
+
+    @Override
+    public void onFertilized(TFCAnimalProperties male)
+    {
+        setFertilized(true);
+        setLastFed(getLastFed() - 1);
+        male.setLastFed(getLastFed() - 1);
+        male.addUses(hatchDays.get());
+        addUses(hatchDays.get()*2);
     }
 
     @Override
@@ -250,12 +296,12 @@ public abstract class OviparousAnimal extends ProducingAnimal implements Pluckab
                 {
                     baby.setGender(Gender.valueOf(random.nextBoolean()));
                     baby.setBirthDay(Calendars.SERVER.getTotalDays());
-                    baby.setFamiliarity(getFamiliarity() < 0.9F ? getFamiliarity() / 2.0F : getFamiliarity() * 0.9F);
+                    baby.setFamiliarity(getFamiliarity());
                     egg.setFertilized(baby, Calendars.SERVER.getTotalDays() + hatchDays.get());
                 }
             }
         }
-        return new AnimalProductEvent(level(), blockPosition(), null, this, stack, ItemStack.EMPTY, 1);
+        return new AnimalProductEvent(level(), blockPosition(), null, this, stack, ItemStack.EMPTY, 2);
     }
 
     @Override
