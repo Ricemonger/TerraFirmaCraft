@@ -200,7 +200,7 @@ public final class TFCItems
     public static final RegistryObject<Item> BLANK_DISC = register("blank_disc");
     public static final RegistryObject<Item> BLUBBER = register("blubber");
     public static final RegistryObject<Item> BRASS_MECHANISMS = register("brass_mechanisms");
-    public static final RegistryObject<Item> BURLAP_CLOTH = register("burlap_cloth");
+    public static final RegistryObject<Item> BURLAP_CLOTH = register("burlap_cloth", () -> new GlassworkingItem(new Item.Properties(), GlassOperation.ROLL));
     public static final RegistryObject<Item> COMPOST = register("compost");
     public static final RegistryObject<Item> DAUB = register("daub");
     public static final RegistryObject<Item> DIRTY_JUTE_NET = register("dirty_jute_net");
@@ -223,7 +223,7 @@ public final class TFCItems
     public static final RegistryObject<Item> PURE_PHOSPHORUS = register("pure_phosphorus");
     public static final RegistryObject<Item> PURE_POTASSIUM = register("pure_potassium");
     public static final RegistryObject<Item> ROTTEN_COMPOST = register("rotten_compost", () -> new RottenCompostItem(new Item.Properties()));
-    public static final RegistryObject<Item> SILK_CLOTH = register("silk_cloth");
+    public static final RegistryObject<Item> SILK_CLOTH = register("silk_cloth", () -> new GlassworkingItem(new Item.Properties(), GlassOperation.ROLL));
     public static final RegistryObject<Item> SANDPAPER = register("sandpaper", () -> new Item(new Item.Properties().defaultDurability(40)));
     public static final RegistryObject<Item> SOAKED_PAPYRUS_STRIP = register("soaked_papyrus_strip");
     public static final RegistryObject<Item> SOOT = register("soot");
