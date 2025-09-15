@@ -236,6 +236,7 @@ public class ServerConfig
     public final ForgeConfigSpec.DoubleValue traitWoodGrilledModifier;
     public final ForgeConfigSpec.DoubleValue traitBurntToACrispModifier;
     public final ForgeConfigSpec.DoubleValue traitWildModifier;
+    public final ForgeConfigSpec.DoubleValue traitInLoggedOutPlayer;
     // Mechanics - Fluids
     public final ForgeConfigSpec.BooleanValue enableBucketsPlacingSources;
     // Mechanics - Vanilla Changes
@@ -625,7 +626,8 @@ public class ServerConfig
         traitWoodGrilledModifier = builder.comment("The modifier for the 'Wood Grilled' food trait. Values less than 1 extend food lifetime, values greater than one decrease it. A value of zero stops decay.").define("traitWoodGrilledModifier", 0.8, 0, Double.MAX_VALUE);
         traitBurntToACrispModifier = builder.comment("The modifier for the 'Burnt To A Crisp' food trait. Values less than 1 extend food lifetime, values greater than one decrease it. A value of zero stops decay.").define("traitBurntToACrispModifier", 2.5, 0, Double.MAX_VALUE);
         traitWildModifier = builder.comment("The modifier for the 'Wild' food trait. Values less than 1 extend food lifetime, values greater than one decrease it. A value of zero stops decay.").define("traitWildModifier", 0.5, 0, Double.MAX_VALUE);
-        
+        traitInLoggedOutPlayer = builder.comment("The modifier for the 'In Logged Out Player' food trait. Values less than 1 extend food lifetime, values greater than one decrease it. A value of zero stops decay.").define("traitInLoggedOutPlayer", 0.005, 0, Double.MAX_VALUE);
+
         builder.swap("fluids");
 
         enableBucketsPlacingSources = builder.comment("If true, TFC buckets that naturally place sources (colored steel) will place sources. If false, this behavior is disabled. By default, colored steel buckets do not place sources.").define("enableBucketsPlacingSources1", false);

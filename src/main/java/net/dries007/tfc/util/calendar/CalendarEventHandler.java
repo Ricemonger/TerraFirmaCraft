@@ -8,10 +8,14 @@ package net.dries007.tfc.util.calendar;
 
 import java.util.List;
 
+import net.dries007.tfc.common.capabilities.food.FoodCapability;
+import net.dries007.tfc.common.capabilities.food.FoodTraits;
+import net.dries007.tfc.common.capabilities.food.IFood;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
@@ -26,17 +30,17 @@ import net.dries007.tfc.common.capabilities.food.TFCFoodData;
 import net.dries007.tfc.config.TFCConfig;
 import org.slf4j.Logger;
 
+import javax.annotation.Nullable;
+
 /**
  * Event handler for calendar related ticking
  *
  * @see ServerCalendar
  */
-public class CalendarEventHandler
-{
+public class CalendarEventHandler {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public static void init()
-    {
+    public static void init() {
         final IEventBus bus = MinecraftForge.EVENT_BUS;
 
         bus.addListener(CalendarEventHandler::onServerStart);
@@ -48,13 +52,11 @@ public class CalendarEventHandler
         bus.addListener(CalendarEventHandler::onPlayerLoggedIn);
     }
 
-    public static void onServerStart(ServerStartingEvent event)
-    {
+    public static void onServerStart(ServerStartingEvent event) {
         Calendars.SERVER.onServerStart(event.getServer());
     }
 
-    public static void onServerStop(ServerStoppedEvent event)
-    {
+    public static void onServerStop(ServerStoppedEvent event) {
         Calendars.SERVER.onServerStop();
     }
 
@@ -65,18 +67,15 @@ public class CalendarEventHandler
      *
      * @param event {@link TickEvent.ServerTickEvent}
      */
-    public static void onServerTick(TickEvent.ServerTickEvent event)
-    {
-        if (event.phase == TickEvent.Phase.START)
-        {
+    public static void onServerTick(TickEvent.ServerTickEvent event) {
+        if (event.phase == TickEvent.Phase.START) {
             Calendars.SERVER.onServerTick();
         }
     }
 
-    public static void onOverworldTick(TickEvent.LevelTickEvent event)
-    {
-        if (event.phase == TickEvent.Phase.END && event.level instanceof ServerLevel level && level.dimension() == Level.OVERWORLD)
-        {
+    public static void onOverworldTick(TickEvent.LevelTickEvent event) {
+        if (event.phase == TickEvent.Phase.END && event.level instanceof ServerLevel level
+                && level.dimension() == Level.OVERWORLD) {
             Calendars.SERVER.onOverworldTick(level);
         }
     }
@@ -86,18 +85,15 @@ public class CalendarEventHandler
      *
      * @param event {@link PlayerWakeUpEvent}
      */
-    public static void onPlayerWakeUp(PlayerWakeUpEvent event)
-    {
-        if (!event.getEntity().getCommandSenderWorld().isClientSide() && !event.updateLevel())
-        {
+    public static void onPlayerWakeUp(PlayerWakeUpEvent event) {
+        if (!event.getEntity().getCommandSenderWorld().isClientSide() && !event.updateLevel()) {
             long currentDayTime = event.getEntity().getCommandSenderWorld().getDayTime();
-            if (Calendars.SERVER.getCalendarDayTime() != currentDayTime)
-            {
+            if (Calendars.SERVER.getCalendarDayTime() != currentDayTime) {
                 // Consume food/water on all online players accordingly
                 final long jump = Calendars.SERVER.setTimeFromDayTime(currentDayTime);
-                final float exhaustion = jump * TFCFoodData.PASSIVE_EXHAUSTION_PER_TICK * TFCConfig.SERVER.passiveExhaustionModifier.get().floatValue();
-                for (Player player : event.getEntity().level().players())
-                {
+                final float exhaustion = jump * TFCFoodData.PASSIVE_EXHAUSTION_PER_TICK
+                        * TFCConfig.SERVER.passiveExhaustionModifier.get().floatValue();
+                for (Player player : event.getEntity().level().players()) {
                     player.causeFoodExhaustion(exhaustion);
                 }
             }
@@ -109,20 +105,27 @@ public class CalendarEventHandler
      *
      * @param event {@link PlayerEvent.PlayerLoggedOutEvent}
      */
-    public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event)
-    {
-        if (event.getEntity() instanceof ServerPlayer player)
-        {
+    public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+
+            for (byte i = 0; i < player.getInventory().getContainerSize(); i++) {
+                final ItemStack item = player.getInventory().getItem(i);
+
+                final @Nullable IFood food = FoodCapability.get(item);
+
+                if (food != null && !food.hasTrait(FoodTraits.IN_LOGGED_OUT_PLAYER)) {
+                    FoodCapability.applyTrait(item, FoodTraits.IN_LOGGED_OUT_PLAYER);
+                }
+
+            }
             // Check total players and reset player / calendar time ticking
             MinecraftServer server = player.getServer();
-            if (server != null)
-            {
+            if (server != null) {
                 LOGGER.info("Player Logged Out - Checking for Calendar Updates.");
                 List<ServerPlayer> players = server.getPlayerList().getPlayers();
                 int playerCount = players.size();
                 // The player logging out doesn't count
-                if (players.contains(player))
-                {
+                if (players.contains(player)) {
                     playerCount--;
                 }
                 Calendars.SERVER.setPlayersLoggedOn(playerCount > 0);
@@ -135,16 +138,28 @@ public class CalendarEventHandler
      *
      * @param event {@link PlayerEvent.PlayerLoggedInEvent}
      */
-    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event)
-    {
-        if (event.getEntity() instanceof ServerPlayer player)
-        {
+    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
             // Check total players and reset player / calendar time ticking
+            player.tick();
+
+            for (byte i = 0; i < player.getInventory().getContainerSize(); i++) {
+                final ItemStack item = player.getInventory().getItem(i);
+
+                final @Nullable IFood food = FoodCapability.get(item);
+
+                if (food != null && food.hasTrait(FoodTraits.IN_LOGGED_OUT_PLAYER)) {
+                    FoodCapability.removeTrait(item, FoodTraits.IN_LOGGED_OUT_PLAYER);
+                }
+
+            }
+
             MinecraftServer server = player.getServer();
-            if (server != null)
-            {
-                LOGGER.info("Player Logged In - Checking for Calendar Updates.");
-                Calendars.SERVER.setPlayersLoggedOn(server.getPlayerList().getPlayerCount() > 0);
+            if (server != null) {
+                {
+                    LOGGER.info("Player Logged In - Checking for Calendar Updates.");
+                    Calendars.SERVER.setPlayersLoggedOn(server.getPlayerList().getPlayerCount() > 0);
+                }
             }
         }
     }

@@ -23,6 +23,7 @@ public class FoodTraits
     public static final FoodTrait WOOD_GRILLED = register("wood_grilled", TFCConfig.SERVER.traitWoodGrilledModifier); // Slight buff when cooking in a grill
     public static final FoodTrait BURNT_TO_A_CRISP = register("burnt_to_a_crisp", TFCConfig.SERVER.traitBurntToACrispModifier); // Cooking food in something that's WAY TOO HOT too cook food in you fool!
     public static final FoodTrait WILD = register("wild", TFCConfig.SERVER.traitWildModifier); // wild pumpkins last a bit longer, just in case you don't see them right away.
+    public static final FoodTrait IN_LOGGED_OUT_PLAYER = register("in_logged_out_player", TFCConfig.SERVER.traitInLoggedOutPlayer); // Food that's in a logged out player's inventory will not decay
 
     public static void registerFoodTraits() { }
 
