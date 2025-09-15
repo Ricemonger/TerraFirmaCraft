@@ -21,6 +21,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -184,8 +185,8 @@ public class Faunas
         event.register(type.entity().get(), type.spawnPlacementType(), type.heightmapType(), (mob, level, heightmap, pos, rand) -> {
             final Fauna fauna = type.fauna().get();
             final ChunkGenerator generator = level.getLevel().getChunkSource().getGenerator();
-            if (rand.nextInt(fauna.getChance()) != 0)
-            {
+            
+            if (heightmap != MobSpawnType.CHUNK_GENERATION && rand.nextInt(fauna.getChance()) != 0) {
                 return false;
             }
 

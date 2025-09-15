@@ -1005,6 +1005,13 @@ public final class ForgeEventHandler
         final LevelAccessor level = event.getLevel();
         final MobSpawnType spawn = event.getSpawnType();
         // we only care about "natural" spawns
+        
+        if (spawn == MobSpawnType.NATURAL && (Helpers.isEntity(entity, TFCTags.Entities.LIVESTOCK)))
+        {
+            event.setSpawnCancelled(true);
+            event.setCanceled(true);
+        }
+
         if (spawn == MobSpawnType.NATURAL || spawn == MobSpawnType.CHUNK_GENERATION || spawn == MobSpawnType.REINFORCEMENT)
         {
             if (Helpers.isEntity(entity, TFCTags.Entities.VANILLA_MONSTERS))

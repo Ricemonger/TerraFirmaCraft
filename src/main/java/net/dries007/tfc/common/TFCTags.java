@@ -294,12 +294,15 @@ public class TFCTags
         public static final TagKey<EntityType<?>> DEALS_PIERCING_DAMAGE = create("deals_piercing_damage");
         public static final TagKey<EntityType<?>> DEALS_CRUSHING_DAMAGE = create("deals_crushing_damage");
         public static final TagKey<EntityType<?>> HORSES = create("horses");
+        public static final TagKey<EntityType<?>> LAND_PREY = create("land_prey");
+        public static final TagKey<EntityType<?>> LAND_PREDATORS = create("land_predators");
         public static final TagKey<EntityType<?>> DESTROYED_BY_LEAVES = create("destroyed_by_leaves");
         public static final TagKey<EntityType<?>> LEASHABLE_WILD_ANIMALS = create("leashable_wild_animals"); // entities that can be leashed that aren't normally leashable. default empty
         public static final TagKey<EntityType<?>> PESTS = create("pests"); // spawned during infestations
         public static final TagKey<EntityType<?>> HUNTED_BY_CATS = create("hunted_by_cats");
         public static final TagKey<EntityType<?>> HUNTED_BY_DOGS = create("hunted_by_dogs");
         public static final TagKey<EntityType<?>> SMALL_FISH = create("small_fish");
+        public static final TagKey<EntityType<?>> LIVESTOCK = create("livestock");
 
         private static TagKey<EntityType<?>> create(String id)
         {
