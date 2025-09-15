@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
 
+import net.dries007.tfc.config.TFCConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -83,8 +84,11 @@ public class SpreadingBushBlock extends StationaryBerryBushBlock implements IFor
     @Override
     protected BlockState growAndPropagate(Level level, BlockPos pos, RandomSource random, BlockState state)
     {
-        if (!state.getValue(LIFECYCLE).active())
-        {
+        double growthMultiplier = TFCConfig.SERVER.globalFruitSaplingGrowthModifier.get() * 10;
+
+        int randomInt = random.nextInt((int) growthMultiplier);
+
+        if (!state.getValue(LIFECYCLE).active() || randomInt != 0) {
             // Only grow when active
             return state;
         }

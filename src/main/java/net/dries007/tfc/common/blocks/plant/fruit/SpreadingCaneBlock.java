@@ -8,6 +8,8 @@ package net.dries007.tfc.common.blocks.plant.fruit;
 
 import java.util.Random;
 import java.util.function.Supplier;
+
+import net.dries007.tfc.config.TFCConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
@@ -76,7 +78,11 @@ public class SpreadingCaneBlock extends SpreadingBushBlock implements IBushBlock
     @Override
     protected BlockState growAndPropagate(Level level, BlockPos pos, RandomSource random, BlockState state)
     {
-        if (!state.getValue(LIFECYCLE).active())
+        double growthMultiplier = TFCConfig.SERVER.globalFruitSaplingGrowthModifier.get() * 10;
+
+        int randomInt = random.nextInt((int) growthMultiplier);
+
+        if (!state.getValue(LIFECYCLE).active() || randomInt != 0) 
         {
             return state; // Only grow when active
         }
