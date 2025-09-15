@@ -106,17 +106,17 @@ public class TFCEntities
 
     // Water Ambient
 
-    public static final Map<Fish, RegistryObject<EntityType<FreshwaterFish>>> FRESHWATER_FISH = Helpers.mapOfKeys(Fish.class, fish -> register(fish.getSerializedName(), EntityType.Builder.<FreshwaterFish>of((type, level) -> new FreshwaterFish(type, level, TFCSounds.FRESHWATER_FISHES.get(fish), TFCItems.FRESHWATER_FISH_BUCKETS.get(fish)), MobCategory.WATER_AMBIENT).sized(fish.getWidth(), fish.getHeight()).clientTrackingRange(4)));
+    public static final Map<Fish, RegistryObject<EntityType<FreshwaterFish>>> FRESHWATER_FISH = Helpers.mapOfKeys(Fish.class, fish -> register(fish.getSerializedName(), EntityType.Builder.<FreshwaterFish>of((type, level) -> new FreshwaterFish(type, level, TFCSounds.FRESHWATER_FISHES.get(fish), TFCItems.FRESHWATER_FISH_BUCKETS.get(fish)), MobCategory.WATER_CREATURE).sized(fish.getWidth(), fish.getHeight()).clientTrackingRange(4)));
 
-    public static final RegistryObject<EntityType<TFCCod>> COD = register("cod", EntityType.Builder.of(TFCCod::new, MobCategory.WATER_AMBIENT).sized(0.5F, 0.3F).clientTrackingRange(4));
-    public static final RegistryObject<EntityType<TFCTropicalFish>> TROPICAL_FISH = register("tropical_fish", EntityType.Builder.of(TFCTropicalFish::new, MobCategory.WATER_AMBIENT).sized(0.5F, 0.4F).clientTrackingRange(4));
-    public static final RegistryObject<EntityType<TFCPufferfish>> PUFFERFISH = register("pufferfish", EntityType.Builder.of(TFCPufferfish::new, MobCategory.WATER_AMBIENT).sized(0.7F, 0.7F).clientTrackingRange(4));
-    public static final RegistryObject<EntityType<Jellyfish>> JELLYFISH = register("jellyfish", EntityType.Builder.of(Jellyfish::new, MobCategory.WATER_AMBIENT).sized(0.5F, 0.5F).clientTrackingRange(4));
+    public static final RegistryObject<EntityType<TFCCod>> COD = register("cod", EntityType.Builder.of(TFCCod::new, MobCategory.WATER_CREATURE).sized(0.5F, 0.3F).clientTrackingRange(4));
+    public static final RegistryObject<EntityType<TFCTropicalFish>> TROPICAL_FISH = register("tropical_fish", EntityType.Builder.of(TFCTropicalFish::new, MobCategory.WATER_CREATURE).sized(0.5F, 0.4F).clientTrackingRange(4));
+    public static final RegistryObject<EntityType<TFCPufferfish>> PUFFERFISH = register("pufferfish", EntityType.Builder.of(TFCPufferfish::new, MobCategory.WATER_CREATURE).sized(0.7F, 0.7F).clientTrackingRange(4));
+    public static final RegistryObject<EntityType<Jellyfish>> JELLYFISH = register("jellyfish", EntityType.Builder.of(Jellyfish::new, MobCategory.WATER_CREATURE).sized(0.5F, 0.5F).clientTrackingRange(4));
 
-    public static final RegistryObject<EntityType<AquaticCritter>> ISOPOD = register("isopod", EntityType.Builder.of(AquaticCritter::salty, MobCategory.WATER_AMBIENT).sized(0.5F, 0.3F).clientTrackingRange(4));
-    public static final RegistryObject<EntityType<AquaticCritter>> LOBSTER = register("lobster", EntityType.Builder.of(AquaticCritter::salty, MobCategory.WATER_AMBIENT).sized(0.5F, 0.3F).clientTrackingRange(4));
-    public static final RegistryObject<EntityType<AquaticCritter>> CRAYFISH = register("crayfish", EntityType.Builder.of(AquaticCritter::fresh, MobCategory.WATER_AMBIENT).sized(0.5F, 0.3F).clientTrackingRange(4));
-    public static final RegistryObject<EntityType<AquaticCritter>> HORSESHOE_CRAB = register("horseshoe_crab", EntityType.Builder.of(AquaticCritter::salty, MobCategory.WATER_AMBIENT).sized(0.5F, 0.3F).clientTrackingRange(4));
+    public static final RegistryObject<EntityType<AquaticCritter>> ISOPOD = register("isopod", EntityType.Builder.of(AquaticCritter::salty, MobCategory.WATER_CREATURE).sized(0.5F, 0.3F).clientTrackingRange(4));
+    public static final RegistryObject<EntityType<AquaticCritter>> LOBSTER = register("lobster", EntityType.Builder.of(AquaticCritter::salty, MobCategory.WATER_CREATURE).sized(0.5F, 0.3F).clientTrackingRange(4));
+    public static final RegistryObject<EntityType<AquaticCritter>> CRAYFISH = register("crayfish", EntityType.Builder.of(AquaticCritter::fresh, MobCategory.WATER_CREATURE).sized(0.5F, 0.3F).clientTrackingRange(4));
+    public static final RegistryObject<EntityType<AquaticCritter>> HORSESHOE_CRAB = register("horseshoe_crab", EntityType.Builder.of(AquaticCritter::salty, MobCategory.WATER_CREATURE).sized(0.5F, 0.3F).clientTrackingRange(4));
 
     // Water Creatures
 
