@@ -88,6 +88,8 @@ public class TFCFoodData extends net.minecraft.world.food.FoodData
         if (oldPlayer.getFoodData() instanceof TFCFoodData oldStats)
         {
             final TFCFoodData newStats = new TFCFoodData(newPlayer, newPlayer.getFoodData(), oldStats.getNutrition());
+            // newStats.setThirst(40); TFC punishment for death replaces?
+            // newStats.setFoodLevel(8); TFC punishment for death replaces?
             ((PlayerAccessor) newPlayer).accessor$setFoodData(newStats);
         }
     }
