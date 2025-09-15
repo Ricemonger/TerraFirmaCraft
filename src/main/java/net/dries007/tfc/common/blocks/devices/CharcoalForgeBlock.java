@@ -58,11 +58,11 @@ public class CharcoalForgeBlock extends DeviceBlock implements IBellowsConsumer
             // Top block
             .match(origin.above(), state -> state.isAir() || Helpers.isBlock(state, TFCTags.Blocks.FORGE_INVISIBLE_WHITELIST))
             // Chimney
-            .matchOneOf(origin.above(), new MultiBlock()
-                .match(origin, skyMatcher)
-                .matchHorizontal(origin, skyMatcher, 1)
-                .matchHorizontal(origin, skyMatcher, 2)
-            )
+            //.matchOneOf(origin.above(), new MultiBlock()
+            //    .match(origin, skyMatcher)
+            //    .matchHorizontal(origin, skyMatcher, 1)
+            //    .matchHorizontal(origin, skyMatcher, 2)
+            //)
             // Underneath
             .matchEachDirection(origin, isValidSide, new Direction[] {Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.DOWN}, 1);
     }

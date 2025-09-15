@@ -379,11 +379,11 @@ public class CharcoalForgeBlockEntity extends TickableInventoryBlockEntity<ItemS
             float itemTemperature = cap.getTemperature();
 
             // Loop through all input slots
-            for (int slot = SLOT_EXTRA_MIN; slot <= SLOT_EXTRA_MAX; slot++)
-            {
-                fluidStack = Helpers.mergeOutputFluidIntoSlot(this.inventory, fluidStack, itemTemperature, slot);
-                if (fluidStack.isEmpty()) break;
-            }
+            // for (int slot = SLOT_EXTRA_MIN; slot <= SLOT_EXTRA_MAX; slot++)
+           // {
+           //     fluidStack = Helpers.mergeOutputFluidIntoSlot(this.inventory, fluidStack, itemTemperature, slot);
+            //    if (fluidStack.isEmpty()) break;
+           // }
 
             FoodCapability.applyTrait(outputStack, FoodTraits.CHARCOAL_GRILLED);
             this.inventory.setStackInSlot(startIndex, outputStack);
