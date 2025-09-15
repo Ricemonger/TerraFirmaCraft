@@ -21,22 +21,18 @@ import net.dries007.tfc.common.entities.ai.GetHookedGoal;
 import net.dries007.tfc.common.fluids.TFCFluids;
 import net.dries007.tfc.util.Helpers;
 
-public class TFCDolphin extends Dolphin implements AquaticMob
-{
-    public TFCDolphin(EntityType<? extends Dolphin> type, Level level)
-    {
+public class TFCDolphin extends Dolphin implements AquaticMob {
+    public TFCDolphin(EntityType<? extends Dolphin> type, Level level) {
         super(type, level);
     }
 
     @Override
-    public boolean canSpawnIn(Fluid fluid)
-    {
+    public boolean canSpawnIn(Fluid fluid) {
         return fluid.isSame(TFCFluids.SALT_WATER.getSource());
     }
 
     @Override
-    protected void registerGoals()
-    {
+    protected void registerGoals() {
         goalSelector.addGoal(0, new BreathAirGoal(this));
         goalSelector.addGoal(0, new TryFindWaterGoal(this));
         goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.2F, true));
@@ -51,8 +47,7 @@ public class TFCDolphin extends Dolphin implements AquaticMob
     }
 
     @Override
-    protected float getBlockSpeedFactor()
-    {
+    protected float getBlockSpeedFactor() {
         return Helpers.isBlock(level().getBlockState(blockPosition()), TFCTags.Blocks.PLANTS) ? 1.0F : super.getBlockSpeedFactor();
     }
 }
