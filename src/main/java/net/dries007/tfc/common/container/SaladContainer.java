@@ -141,6 +141,7 @@ public class SaladContainer extends Container implements ISlotCallback
                 // At least one bowl exists, so create a salad
                 float water = 0, saturation = 0;
                 float[] nutrition = new float[Nutrient.TOTAL];
+                int hunger = 0;
                 int ingredientCount = 0; // The number of unique ingredients
                 int minIngredientCount = 64; // The minimum stack size of the ingredients
                 final List<ItemStack> ingredients = new ArrayList<>();
@@ -158,6 +159,7 @@ public class SaladContainer extends Container implements ISlotCallback
                             break;
                         }
 
+                        hunger += food.getData().hunger();
                         water += food.getData().water();
                         saturation += food.getData().saturation();
 
@@ -206,7 +208,7 @@ public class SaladContainer extends Container implements ISlotCallback
                             handler.setCreationDate(FoodCapability.getRoundedCreationDate());
                             handler.setIngredients(ingredients);
                             handler.setBowl(bowlStack.copy().split(1));
-                            handler.setFood(FoodData.create(4, water, saturation, nutrition, 4.0f));
+                            handler.setFood(FoodData.create(hunger, water, saturation, nutrition, 4.0f));
                         }
                         inventory.setStackInSlot(SLOT_OUTPUT, salad);
                         return;

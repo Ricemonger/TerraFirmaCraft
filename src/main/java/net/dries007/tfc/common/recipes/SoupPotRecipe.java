@@ -58,6 +58,7 @@ public class SoupPotRecipe extends PotRecipe
         float[] nutrition = new float[Nutrient.TOTAL];
         ItemStack soupStack = ItemStack.EMPTY;
         final List<ItemStack> itemIngredients = new ArrayList<>();
+        int foodValue = 0;
         for (int i = PotBlockEntity.SLOT_EXTRA_INPUT_START; i <= PotBlockEntity.SLOT_EXTRA_INPUT_END; i++)
         {
             final ItemStack stack = inventory.getStackInSlot(i);
@@ -73,6 +74,7 @@ public class SoupPotRecipe extends PotRecipe
                 final FoodData data = food.getData();
                 water += data.water();
                 saturation += data.saturation();
+                foodValue += Math.max(2, data.hunger());
                 for (Nutrient nutrient : Nutrient.VALUES)
                 {
                     nutrition[nutrient.ordinal()] += data.nutrient(nutrient);
@@ -96,9 +98,9 @@ public class SoupPotRecipe extends PotRecipe
                     maxNutrient = nutrient;
                 }
             }
-            FoodData data = FoodData.create(SOUP_HUNGER_VALUE, water, saturation, nutrition, SOUP_DECAY_MODIFIER);
             int servings = (int) (ingredientCount / 2f) + 1;
             long created = FoodCapability.getRoundedCreationDate();
+            FoodData data = FoodData.create((int) Math.ceil((float) foodValue / servings), water, saturation, nutrition, SOUP_DECAY_MODIFIER);
 
             soupStack = new ItemStack(TFCItems.SOUPS.get(maxNutrient).get(), servings);
             final @Nullable IFood food = FoodCapability.get(soupStack);
