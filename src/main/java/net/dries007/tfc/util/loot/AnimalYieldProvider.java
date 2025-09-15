@@ -29,23 +29,24 @@ public class AnimalYieldProvider extends MinMaxProvider
     {
         final Entity entity = context.getParamOrNull(LootContextParams.THIS_ENTITY);
         final Player player = context.getParamOrNull(LootContextParams.LAST_DAMAGE_PLAYER);
-        if (entity instanceof TFCAnimalProperties properties)
-        {
+        if (entity instanceof TFCAnimalProperties properties) {
             float adjustedSize = properties.getGeneticSize();
-            if (player != null)
-            {
+            if (player != null) {
                 // 1 attack damage is equivalent to 0.5 extra animal size in terms of drops. may need to be adjusted.
-                adjustedSize += Mth.clampedMap(player.getAttributeValue(Attributes.ATTACK_DAMAGE), 0, 16, 1, 8);
-            }
-            final float familiarity = properties.getFamiliarity();
-            if (familiarity > 0.5f)
-            {
-                // 0.5 -> 1 familiarity scaled to 1 -> 8f extra size
-                adjustedSize += Mth.clampedMap(familiarity, 0.5f, 1f, 1f, 8f);
+                adjustedSize += Mth.clampedMap(player.getAttributeValue(Attributes.ATTACK_DAMAGE), 0, 16, 0, 8);
             }
 
-            // 32 (max size) + 8 (max damage contrib) + 6 (max familiarity contribution)
-            final float scaledSize = Mth.clampedMap(adjustedSize, 1f, 46f, 0f, 1f);
+            final float familiarity = properties.getFamiliarity();
+            // 0 -> 1 familiarity scaled to 0 -> 20f extra size
+            adjustedSize += Mth.clampedMap(familiarity, 0f, 1f, 0f, 20f);
+
+            if (properties.getUsesToElderly() > 0) {
+                final float leftUses = 1f - properties.getUses() / properties.getUsesToElderly();
+                adjustedSize += Mth.clampedMap(leftUses, 0f, 1f, 0f, 20f);
+            }
+
+            // max adjusted size is 80f
+            final float scaledSize = Mth.clampedMap(adjustedSize, 1f, 81f, 0f, 1f);
             return Mth.lerp(scaledSize, min.getFloat(context), max.getFloat(context));
         }
         return min.getFloat(context);
