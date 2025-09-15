@@ -48,6 +48,7 @@ public final class EnvironmentHelpers
 {
     public static final int ICICLE_MELT_RANDOM_TICK_CHANCE = 4; // Icicles don't melt naturally well at all, since they form under overhangs
     public static final int SNOW_MELT_RANDOM_TICK_CHANCE = 5; // Snow and ice melt naturally, but snow naturally gets placed under overhangs due to smoothing
+    public static final int SNOW_BLOCK_MELT_RANDOM_TICK_CHANCE = 50; // Snow Block melt chance
     public static final int ICE_MELT_RANDOM_TICK_CHANCE = 200; // Ice practically never should form under overhangs, so this can be very low chance
     public static final int ICICLE_MAX_LENGTH = 7;
 
@@ -69,6 +70,8 @@ public final class EnvironmentHelpers
 
         profiler.push("tfcSnow");
         doSnow(level, surfacePos, temperature);
+        profiler.popPush("tfcSnowBlock");
+        meltSnowBlock(level, lcgPos, temperature);
         profiler.popPush("tfcIce");
         doIce(level, groundPos, temperature);
         profiler.popPush("tfcIcicles");
@@ -179,6 +182,16 @@ public final class EnvironmentHelpers
                     removeSnowAt(level, surfacePos.relative(Direction.Plane.HORIZONTAL.getRandomDirection(random)), temperature, expectedLayers);
                 }
             }
+        }
+    }
+
+    private static void meltSnowBlock(Level level, BlockPos lcgPos, float temperature)
+    {
+        final RandomSource random = level.random;
+        final BlockState state = level.getBlockState(lcgPos);
+        if (state.getBlock() == Blocks.SNOW_BLOCK && temperature > OverworldClimateModel.SNOW_FREEZE_TEMPERATURE && random.nextInt(SNOW_BLOCK_MELT_RANDOM_TICK_CHANCE) == 0)
+        {
+            level.removeBlock(lcgPos, false);
         }
     }
 
