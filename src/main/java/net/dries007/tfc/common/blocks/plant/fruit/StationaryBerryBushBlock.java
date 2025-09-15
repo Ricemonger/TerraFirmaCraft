@@ -163,7 +163,7 @@ public class StationaryBerryBushBlock extends SeasonalPlantBlock implements HoeO
      */
     protected boolean mayDie(Level level, BlockPos pos, BlockState state, int monthsSpentDying)
     {
-        return monthsSpentDying >= MONTHS_SPENT_DORMANT_TO_DIE;
+        return false;
     }
 
     protected BlockState getNewState(Level level, BlockPos pos)
