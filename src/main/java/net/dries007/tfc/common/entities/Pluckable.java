@@ -23,55 +23,47 @@ import net.dries007.tfc.util.calendar.Calendars;
 import net.dries007.tfc.util.calendar.ICalendar;
 import net.dries007.tfc.util.events.AnimalProductEvent;
 
-public interface Pluckable
-{
-    int PLUCKING_COOLDOWN = ICalendar.TICKS_IN_HOUR;
+public interface Pluckable {
+    int PLUCKING_COOLDOWN = ICalendar.TICKS_IN_HOUR * 24;
 
     long getLastPluckedTick();
 
     void setLastPluckedTick(long tick);
 
-    default boolean pluck(Player player, InteractionHand hand, LivingEntity entity)
-    {
+    default boolean pluck(Player player, InteractionHand hand, LivingEntity entity) {
         final Level level = entity.level();
         if (level.isClientSide || hand == InteractionHand.OFF_HAND)
             return false;
-        if (player.getItemInHand(hand).isEmpty() && player.isShiftKeyDown() && (entity.getHealth() / entity.getMaxHealth() > 0.15001f))
-        {
-            if (Calendars.SERVER.getTicks() < getLastPluckedTick() + PLUCKING_COOLDOWN)
-            {
-                player.displayClientMessage(Component.translatable("tfc.tooltip.animal.cannot_pluck", ICalendar.getTimeDelta(PLUCKING_COOLDOWN - (Calendars.SERVER.getTicks() -  getLastPluckedTick()), Calendars.SERVER.getCalendarDaysInMonth())), true);
+        if (player.getItemInHand(hand).isEmpty() && player.isShiftKeyDown() && (entity.getHealth() / entity.getMaxHealth() > 0.15001f)) {
+            if (Calendars.SERVER.getTicks() < getLastPluckedTick() + PLUCKING_COOLDOWN) {
+                player.displayClientMessage(Component.translatable("tfc.tooltip.animal.cannot_pluck", ICalendar.getTimeDelta(PLUCKING_COOLDOWN - (Calendars.SERVER.getTicks() - getLastPluckedTick()), Calendars.SERVER.getCalendarDaysInMonth())), true);
                 return false;
             }
-            if (entity.getHealth() / entity.getMaxHealth() <= 0.15f)
-            {
+            if (entity.getHealth() / entity.getMaxHealth() <= 0.15f) {
                 player.displayClientMessage(Component.translatable("tfc.tooltip.animal.cannot_pluck_old_or_sick"), true);
                 return false;
             }
             ItemStack feather = new ItemStack(Items.FEATHER, Mth.nextInt(entity.getRandom(), 1, 3));
-            if (entity instanceof TFCAnimalProperties properties)
-            {
+            if (entity instanceof TFCAnimalProperties properties) {
                 // since becoming old is asynchronous it is not enough
-                if (properties.getAgeType() == TFCAnimalProperties.Age.ADULT && properties.getUses() < properties.getUsesToElderly())
-                {
-                    AnimalProductEvent event = new AnimalProductEvent(level, entity.blockPosition(), player, properties, feather, ItemStack.EMPTY, 1);
-                    if (!MinecraftForge.EVENT_BUS.post(event))
-                    {
+                if (properties.getAgeType() == TFCAnimalProperties.Age.ADULT && properties.getUses() < properties.getUsesToElderly()) {
+                    AnimalProductEvent event = new AnimalProductEvent(level, entity.blockPosition(), player, properties, feather, ItemStack.EMPTY, 2);
+                    if (!MinecraftForge.EVENT_BUS.post(event)) {
                         TFCDamageSources.pluck(entity, entity.getMaxHealth() * 0.15f, null);
                         properties.addUses(event.getUses());
-                        ItemHandlerHelper.giveItemToPlayer(player, event.getProduct());
+                        if (Math.random() > 0.75) {
+                            ItemHandlerHelper.giveItemToPlayer(player, event.getProduct());
+                        }
                     }
                     setLastPluckedTick(Calendars.SERVER.getTicks());
-                }
-                else
-                {
+                } else {
                     player.displayClientMessage(Component.translatable("tfc.tooltip.animal.cannot_pluck_old_or_sick"), true);
                     return false;
                 }
-            }
-            else
-            {
-                ItemHandlerHelper.giveItemToPlayer(player, feather);
+            } else {
+                if (Math.random() > 0.25) {
+                    ItemHandlerHelper.giveItemToPlayer(player, feather);
+                }
                 TFCDamageSources.pluck(entity, entity.getMaxHealth() * 0.15f, null);
                 setLastPluckedTick(Calendars.SERVER.getTicks());
             }
