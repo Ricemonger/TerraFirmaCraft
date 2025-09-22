@@ -51,7 +51,7 @@ public interface Pluckable {
                     if (!MinecraftForge.EVENT_BUS.post(event)) {
                         TFCDamageSources.pluck(entity, entity.getMaxHealth() * 0.15f, null);
                         properties.addUses(event.getUses());
-                        if (Math.random() > 0.75) {
+                        if (Math.random() > 0.875) {
                             ItemHandlerHelper.giveItemToPlayer(player, event.getProduct());
                         }
                     }
@@ -61,7 +61,7 @@ public interface Pluckable {
                     return false;
                 }
             } else {
-                if (Math.random() > 0.25) {
+                if (Math.random() > 0.5) {
                     ItemHandlerHelper.giveItemToPlayer(player, feather);
                 }
                 TFCDamageSources.pluck(entity, entity.getMaxHealth() * 0.15f, null);
