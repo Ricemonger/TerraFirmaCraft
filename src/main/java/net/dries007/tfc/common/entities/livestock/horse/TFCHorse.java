@@ -72,7 +72,8 @@ public class TFCHorse extends Horse implements HorseProperties
     private static final EntityDataAccessor<Long> OLD_DAY = SynchedEntityData.defineId(TFCHorse.class, EntityHelpers.LONG_SERIALIZER);
     private static final EntityDataAccessor<Integer> GENETIC_SIZE = SynchedEntityData.defineId(TFCHorse.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Long> LAST_FED = SynchedEntityData.defineId(TFCHorse.class, EntityHelpers.LONG_SERIALIZER);
-    private static final CommonAnimalData ANIMAL_DATA = new CommonAnimalData(GENDER, BIRTHDAY, FAMILIARITY, USES, FERTILIZED, OLD_DAY, GENETIC_SIZE, LAST_FED);
+    private static final EntityDataAccessor<Long> DAYS_TILL_DIE = SynchedEntityData.defineId(TFCHorse.class, EntityHelpers.LONG_SERIALIZER);
+    private static final CommonAnimalData ANIMAL_DATA = new CommonAnimalData(GENDER, BIRTHDAY, FAMILIARITY, USES, FERTILIZED, OLD_DAY, GENETIC_SIZE, LAST_FED,DAYS_TILL_DIE);
     private static final EntityDataAccessor<Long> PREGNANT_TIME = SynchedEntityData.defineId(TFCHorse.class, EntityHelpers.LONG_SERIALIZER);
 
     private long lastFDecay; //Last time(in days) this entity's familiarity had decayed

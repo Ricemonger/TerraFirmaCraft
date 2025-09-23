@@ -37,7 +37,7 @@ val jadeVersion: String = "4614153"
 val topVersion: String = "4629624"
 
 val modId: String = "tfc"
-val modVersion: String = System.getenv("VERSION") ?: "0.0.0-indev"
+val modVersion: String = "modified"
 
 // Optional dev-env properties
 val mappingsChannel: String = project.findProperty("mappings_channel") as String? ?: "official"

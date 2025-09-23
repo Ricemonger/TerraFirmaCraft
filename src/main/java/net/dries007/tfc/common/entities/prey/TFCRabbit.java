@@ -7,6 +7,8 @@
 package net.dries007.tfc.common.entities.prey;
 
 import javax.annotation.Nullable;
+
+import net.dries007.tfc.common.entities.livestock.horse.TFCHorse;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -73,7 +75,8 @@ public class TFCRabbit extends Rabbit implements MammalProperties
     private static final EntityDataAccessor<Long> OLD_DAY = SynchedEntityData.defineId(TFCRabbit.class, EntityHelpers.LONG_SERIALIZER);
     private static final EntityDataAccessor<Integer> GENETIC_SIZE = SynchedEntityData.defineId(TFCRabbit.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Long> LAST_FED = SynchedEntityData.defineId(TFCRabbit.class, EntityHelpers.LONG_SERIALIZER);
-    private static final CommonAnimalData ANIMAL_DATA = new CommonAnimalData(GENDER, BIRTHDAY, FAMILIARITY, USES, FERTILIZED, OLD_DAY, GENETIC_SIZE, LAST_FED);
+    private static final EntityDataAccessor<Long> DAYS_TILL_DIE = SynchedEntityData.defineId(TFCRabbit.class, EntityHelpers.LONG_SERIALIZER);
+    private static final CommonAnimalData ANIMAL_DATA = new CommonAnimalData(GENDER, BIRTHDAY, FAMILIARITY, USES, FERTILIZED, OLD_DAY, GENETIC_SIZE, LAST_FED,DAYS_TILL_DIE);
     private static final EntityDataAccessor<Long> PREGNANT_TIME = SynchedEntityData.defineId(TFCRabbit.class, EntityHelpers.LONG_SERIALIZER);
 
     private long lastFDecay; //Last time(in days) this entity's familiarity had decayed
