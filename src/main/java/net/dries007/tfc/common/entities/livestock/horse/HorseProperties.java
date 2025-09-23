@@ -14,6 +14,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -105,22 +106,26 @@ public interface HorseProperties extends MammalProperties {
 
     @Override
     default void tickAnimalData() {
+
+        long daysUnticked = getCalendar().getTotalDays() - getLastFamiliarityDecay();
+
         if (getLastFamiliarityDecay() > -1 && getLastFamiliarityDecay() + 1 < getCalendar().getTotalDays() && !getEntity().level().isClientSide) {
             if (getAgeType() != Age.CHILD) {
-                addUses((int) (getCalendar().getTotalDays() - getLastFamiliarityDecay()));
+                addUses((int) (daysUnticked));
             }
+
 
             // Decay must only occur on server, as the last familiarity decay is not synced, so this produces invalid results on client
             float familiarity = getFamiliarity();
             if (familiarity > 0f && familiarity < 0.5f) {
-                familiarity -= 0.02 * (getCalendar().getTotalDays() - getLastFamiliarityDecay());
+                familiarity -= 0.02 * daysUnticked;
 
                 if (familiarity < 0f)
                     familiarity = 0f;
 
                 this.setFamiliarity(familiarity);
             } else if (familiarity > 0.5f) {
-                familiarity -= 0.02 * (getCalendar().getTotalDays() - getLastFamiliarityDecay());
+                familiarity -= 0.02 * daysUnticked;
 
                 if (familiarity < 0.5f)
                     familiarity = 0.5f;
@@ -138,6 +143,19 @@ public interface HorseProperties extends MammalProperties {
         if (!getEntity().level().isClientSide && age == Age.ADULT && getUses() > getUsesToElderly() && getOldDay() == -1L) {
             final long oldDay = getCalendar().getTotalDays() + 1 + getEntity().getRandom().nextInt(5);
             setOldDay(oldDay);
+        }
+
+        long daysTillDie = getDaysTillDie();
+
+        if (age == Age.OLD && daysTillDie == -1) {
+            setDaysTillDie(Mth.nextInt(getEntity().level().getRandom(), 10, 30));
+        } else if (age == Age.OLD && daysTillDie > 0) {
+            long newDaysTillDie = daysTillDie - daysUnticked;
+            if (daysTillDie > 0) {
+                setDaysTillDie(newDaysTillDie);
+            } else {
+                getEntity().hurt(getEntity().level().damageSources().generic(), 1000);
+            }
         }
 
         Level level = getEntity().level();
