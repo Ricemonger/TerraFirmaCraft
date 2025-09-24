@@ -66,6 +66,10 @@ idea {
 repositories {
     mavenCentral()
     mavenLocal()
+    maven {
+        name = "Gegy"
+        url = uri("https://maven.gegy.dev")
+    }
     maven(url = "https://dvs1.progwml6.com/files/maven/") // JEI
     maven(url = "https://modmaven.k-4u.nl") // Mirror for JEI
     maven(url = "https://maven.blamejared.com") // Patchouli
@@ -95,6 +99,8 @@ dependencies {
     // Jade / The One Probe
     compileOnly(fg.deobf("curse.maven:jade-324717:${jadeVersion}"))
     compileOnly(fg.deobf("curse.maven:top-245211:${topVersion}"))
+
+    compileOnly (fg.deobf("curse.maven:dynamiclights-reforged-551736:6044481"))
 
     // Only use Jade at runtime
     runtimeOnly(fg.deobf("curse.maven:jade-324717:${jadeVersion}"))

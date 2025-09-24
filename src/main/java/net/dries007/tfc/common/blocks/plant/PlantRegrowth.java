@@ -89,46 +89,6 @@
       */
      @SuppressWarnings("deprecation")
      public static void placeRisingRock(ServerLevel level, BlockPos pos, RandomSource random) {
-         /*
-         if (random.nextFloat() < TFCConfig.SERVER.grassSpawningRocksChance.get() * 10
-             && Calendars.get(level).getCalendarMonthOfYear().getSeason() != Season.WINTER
-             && Climate.getRainfall(level, pos) > 150
-             && level.isAreaLoaded(pos, 6)) {
-             final BlockState currentState = level.getBlockState(pos);
-             final boolean isInAir = currentState.isAir();
-             BlockState state;
-             if (isInAir) {
-                 Plant plant;
-                 int randomGrass = random.nextInt(11);
-                 switch (randomGrass) {
-                     case 0 -> plant = Plant.BEACHGRASS;
-                     case 1 -> plant = Plant.BLUEGRASS;
-                     case 2 -> plant = Plant.BROMEGRASS;
-                     case 3 -> plant = Plant.FOUNTAIN_GRASS;
-                     case 4 -> plant = Plant.MANATEE_GRASS;
-                     case 5 -> plant = Plant.ORCHARD_GRASS;
-                     case 6 -> plant = Plant.RYEGRASS;
-                     case 7 -> plant = Plant.SCUTCH_GRASS;
-                     case 8 -> plant = Plant.STAR_GRASS;
-                     case 9 -> plant = Plant.TIMOTHY_GRASS;
-                     case 10 -> plant = Plant.RADDIA_GRASS;
-                     default -> plant = Plant.FOUNTAIN_GRASS;
-                 }
- 
-                 state =  ShortGrassBlock.create(plant,
-                     ExtendedProperties.of(nonSolid(plant)).flammable(60, 30).offsetType(BlockBehaviour.OffsetType.XZ)).getPlant()
- 
-                 if (state != null) {
-                     state = FluidHelpers.fillWithFluid(state, level.getFluidState(pos).getType());
-                     if (state != null && state.canSurvive(level, pos)) {
-                         level.setBlockAndUpdate(pos, state);
-                     }
-                 }
-             }
-         }
- 
-          */
- 
          if (random.nextFloat() > TFCConfig.SERVER.grassSpawningRocksChance.get()
              || Calendars.SERVER.getCalendarMonthOfYear().getSeason() != Season.SPRING
              || Climate.getAverageTemperature(level, pos) > 12f
@@ -190,7 +150,7 @@
  
          if (currentState.isAir()) {
  
-             int timothyOrFescue = random.nextInt(3);
+             int timothyOrFescue = random.nextInt(2);
  
              if (timothyOrFescue == 0) {
                  ShortGrassBlock grass = (ShortGrassBlock) TFCBlocks.PLANTS.get(Plant.TIMOTHY_GRASS).get();
@@ -199,9 +159,8 @@
                  ShortGrassBlock grass = (ShortGrassBlock) TFCBlocks.PLANTS.get(Plant.TALL_FESCUE_GRASS).get();
                  state = grass.updateStateWithCurrentMonth(grass.defaultBlockState().setValue(AGE, 0));
              }
- 
-             state = FluidHelpers.fillWithFluid(state, level.getFluidState(pos).getType());
-             if (state == null || !state.canSurvive(level, pos)) {
+
+             if (!state.canSurvive(level, pos)) {
                  return;
              }
          } else {
