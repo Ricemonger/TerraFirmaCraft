@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -30,34 +31,26 @@ import net.dries007.tfc.common.recipes.RecipeHelpers;
 import net.dries007.tfc.util.Helpers;
 import net.dries007.tfc.util.JsonHelpers;
 
-public record MealModifier(FoodData baseFood, List<MealPortion> portions) implements ItemStackModifier
-{
+public record MealModifier(FoodData baseFood, List<MealPortion> portions) implements ItemStackModifier {
     @Override
-    public ItemStack apply(ItemStack stack, ItemStack input)
-    {
+    public ItemStack apply(ItemStack stack, ItemStack input) {
         final @Nullable IFood inputFood = FoodCapability.get(stack);
-        if (!(inputFood instanceof FoodHandler.Dynamic handler))
-        {
+        if (!(inputFood instanceof FoodHandler.Dynamic handler)) {
             return stack;
         }
 
         final List<ItemStack> itemIngredients = new ArrayList<>();
-        for (final ItemStack item : RecipeHelpers.getCraftingInput())
-        {
-            if (FoodCapability.has(item))
-            {
+        for (final ItemStack item : RecipeHelpers.getCraftingInput()) {
+            if (FoodCapability.has(item)) {
                 boolean alreadyAdded = false;
-                for (ItemStack existing : itemIngredients)
-                {
-                    if (existing.getItem() == item.getItem())
-                    {
+                for (ItemStack existing : itemIngredients) {
+                    if (existing.getItem() == item.getItem()) {
                         existing.grow(1);
                         alreadyAdded = true;
                         break;
                     }
                 }
-                if (!alreadyAdded)
-                {
+                if (!alreadyAdded) {
                     final ItemStack tooltipItem = item.copyWithCount(1);
 
                     // Clear any transient data that doesn't display, so we don't create weird stackability issues
@@ -69,8 +62,7 @@ public record MealModifier(FoodData baseFood, List<MealPortion> portions) implem
             }
         }
 
-        if (itemIngredients.isEmpty())
-        {
+        if (itemIngredients.isEmpty()) {
             return stack;
         }
 
@@ -78,19 +70,17 @@ public record MealModifier(FoodData baseFood, List<MealPortion> portions) implem
         itemIngredients.sort(Comparator.comparing(ItemStack::getCount)
             .thenComparing(item -> BuiltInRegistries.ITEM.getKey(item.getItem())));
 
+        float hunger = baseFood.hunger();
         float[] nutrition = baseFood.nutrients();
         float saturation = baseFood.saturation();
         float water = baseFood.water();
 
         final Map<ItemStack, MealPortion> map = new HashMap<>();
         // stuff we can match to portions
-        for (ItemStack ingredient : itemIngredients)
-        {
+        for (ItemStack ingredient : itemIngredients) {
             MealPortion selected = null;
-            for (MealPortion portion : portions)
-            {
-                if (portion.test(ingredient))
-                {
+            for (MealPortion portion : portions) {
+                if (portion.test(ingredient)) {
                     selected = portion;
                     break;
                 }
@@ -99,50 +89,43 @@ public record MealModifier(FoodData baseFood, List<MealPortion> portions) implem
                 map.put(ingredient, selected);
         }
 
-        for (Map.Entry<ItemStack, MealPortion> entry : map.entrySet())
-        {
+        for (Map.Entry<ItemStack, MealPortion> entry : map.entrySet()) {
             final ItemStack item = entry.getKey();
             final MealPortion portion = entry.getValue();
             final @Nullable IFood food = FoodCapability.get(item);
-            if (food != null)
-            {
+            if (food != null) {
                 final var data = food.getData();
-                for (Nutrient nutrient : Nutrient.VALUES)
-                {
+                for (Nutrient nutrient : Nutrient.VALUES) {
                     nutrition[nutrient.ordinal()] += data.nutrient(nutrient) * portion.nutrientModifier * item.getCount();
                 }
+                hunger += data.hunger() * portion.hungerModifier * item.getCount();
                 water += data.water() * portion.waterModifier * item.getCount();
                 saturation += data.saturation() * portion.saturationModifier * item.getCount();
             }
         }
 
 
-        handler.setFood(FoodData.create(baseFood.hunger(), water, saturation, nutrition, baseFood.decayModifier()));
+        handler.setFood(FoodData.create((int) hunger, water, saturation, nutrition, baseFood.decayModifier()));
         handler.setIngredients(itemIngredients);
         handler.setCreationDate(FoodCapability.getRoundedCreationDate());
         return stack;
     }
 
     @Override
-    public Serializer serializer()
-    {
+    public Serializer serializer() {
         return Serializer.INSTANCE;
     }
 
-    public enum Serializer implements ItemStackModifier.Serializer<MealModifier>
-    {
+    public enum Serializer implements ItemStackModifier.Serializer<MealModifier> {
         INSTANCE;
 
         @Override
-        public MealModifier fromJson(JsonObject json)
-        {
+        public MealModifier fromJson(JsonObject json) {
             final var food = FoodData.read(json.getAsJsonObject("food"));
             final List<MealPortion> portions = new ArrayList<>();
             final var array = JsonHelpers.getAsJsonArray(json, "portions", new JsonArray());
-            if (!array.isEmpty())
-            {
-                for (JsonElement element : array)
-                {
+            if (!array.isEmpty()) {
+                for (JsonElement element : array) {
                     portions.add(MealPortion.fromJson(element.getAsJsonObject()));
                 }
             }
@@ -150,51 +133,48 @@ public record MealModifier(FoodData baseFood, List<MealPortion> portions) implem
         }
 
         @Override
-        public MealModifier fromNetwork(FriendlyByteBuf buffer)
-        {
+        public MealModifier fromNetwork(FriendlyByteBuf buffer) {
             final var food = FoodData.decode(buffer);
             final List<MealPortion> portions = Helpers.decodeAll(buffer, new ArrayList<>(), MealPortion::fromNetwork);
             return new MealModifier(food, portions);
         }
 
         @Override
-        public void toNetwork(MealModifier modifier, FriendlyByteBuf buffer)
-        {
+        public void toNetwork(MealModifier modifier, FriendlyByteBuf buffer) {
             modifier.baseFood.encode(buffer);
             Helpers.encodeAll(buffer, modifier.portions, (por, buf) -> por.toNetwork(buffer));
         }
     }
 
-    public record MealPortion(@Nullable Ingredient ingredient, float nutrientModifier, float waterModifier, float saturationModifier)
-    {
-        public boolean test(ItemStack stack)
-        {
+    public record MealPortion(@Nullable Ingredient ingredient, float hungerModifier, float nutrientModifier,
+                              float waterModifier, float saturationModifier) {
+        public boolean test(ItemStack stack) {
             return ingredient == null || ingredient.test(stack);
         }
 
-        private static MealPortion fromJson(JsonObject json)
-        {
+        private static MealPortion fromJson(JsonObject json) {
             return new MealPortion(
                 json.has("ingredient") ? Ingredient.fromJson(json.get("ingredient")) : null,
+                JsonHelpers.getAsFloat(json, "hunger_modifier", 1f),
                 JsonHelpers.getAsFloat(json, "nutrient_modifier", 1f),
                 JsonHelpers.getAsFloat(json, "water_modifier", 1f),
                 JsonHelpers.getAsFloat(json, "saturation_modifier", 1f)
             );
         }
 
-        private static MealPortion fromNetwork(FriendlyByteBuf buffer)
-        {
+        private static MealPortion fromNetwork(FriendlyByteBuf buffer) {
             return new MealPortion(
                 Helpers.decodeNullable(buffer, Ingredient::fromNetwork),
+                buffer.readFloat(),
                 buffer.readFloat(),
                 buffer.readFloat(),
                 buffer.readFloat()
             );
         }
 
-        private void toNetwork(FriendlyByteBuf buffer)
-        {
+        private void toNetwork(FriendlyByteBuf buffer) {
             Helpers.encodeNullable(ingredient, buffer, (i, buf) -> i.toNetwork(buffer));
+            buffer.writeFloat(hungerModifier);
             buffer.writeFloat(nutrientModifier);
             buffer.writeFloat(waterModifier);
             buffer.writeFloat(saturationModifier);
