@@ -169,7 +169,7 @@ public interface TFCAnimalProperties extends GenderedRenderAnimal, BrainBreeder 
             setDaysTillDie(Mth.nextInt(getEntity().level().getRandom(), 10, 30));
         } else if (age == Age.OLD && daysTillDie > 0) {
             long newDaysTillDie = daysTillDie - daysUnticked;
-            if (daysTillDie > 0) {
+            if (newDaysTillDie > 0) {
                 setDaysTillDie(newDaysTillDie);
             } else {
                 getEntity().hurt(getEntity().level().damageSources().generic(), 1000);
