@@ -140,11 +140,11 @@ public class NutritionData
         for (int i = 0; i < records.size(); i++)
         {
             FoodData record = records.get(i);
-            int nextHunger = record.hunger() + runningHungerTotal;
+            int nextHunger = 4 + runningHungerTotal;
             if (nextHunger <= this.hungerWindow)
             {
                 // Add weighted nutrition, keep moving
-                updateAllNutrients(nutrients, j -> nutrients[j.ordinal()] + record.nutrient(j) * Math.max(record.hunger(), 4));
+                updateAllNutrients(nutrients, j -> nutrients[j.ordinal()] + record.nutrient(j) * 4);
                 runningHungerTotal = nextHunger;
             }
             else
