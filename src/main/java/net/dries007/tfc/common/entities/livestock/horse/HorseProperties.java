@@ -149,7 +149,7 @@ public interface HorseProperties extends MammalProperties {
 
         if (age == Age.OLD && daysTillDie == -1) {
             setDaysTillDie(Mth.nextInt(getEntity().level().getRandom(), 10, 30));
-        } else if (age == Age.OLD && daysTillDie > 0) {
+        } else if (age == Age.OLD && daysTillDie >= 0) {
             long newDaysTillDie = daysTillDie - daysUnticked;
             if (newDaysTillDie > 0) {
                 setDaysTillDie(newDaysTillDie);
