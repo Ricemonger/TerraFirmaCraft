@@ -38,11 +38,11 @@ public class AnimalYieldProvider extends MinMaxProvider
 
             final float familiarity = properties.getFamiliarity();
             // 0 -> 1 familiarity scaled to 0 -> 20f extra size
-            adjustedSize += Mth.clampedMap(familiarity, 0f, 1f, 0f, 20f);
+            adjustedSize += Mth.clampedMap(familiarity, 0f, 0.25f, 0f, 20f);
 
             if (properties.getUsesToElderly() > 0) {
                 final float leftUses = 1f - properties.getUses() / properties.getUsesToElderly();
-                adjustedSize += Mth.clampedMap(leftUses, 0f, 1f, 0f, 20f);
+                adjustedSize += Mth.clampedMap(leftUses, 0f, 0.66f, 0f, 20f);
             }
 
             // max adjusted size is 80f
