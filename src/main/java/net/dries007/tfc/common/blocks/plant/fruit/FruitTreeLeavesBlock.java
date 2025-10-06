@@ -150,7 +150,9 @@ public class FruitTreeLeavesBlock extends SeasonalPlantBlock implements IForgeBl
 
                 if (range.checkBoth(hydration, Climate.getAverageTemperature(level, pos), false))
                 {
-                    currentLifecycle = currentLifecycle.advanceTowards(expectedLifecycle);
+                    if(currentLifecycle == Lifecycle.FLOWERING&& Math.random() > 0.9f){
+                        currentLifecycle = currentLifecycle.advanceTowards(expectedLifecycle);
+                    }
                 }
                 else
                 {

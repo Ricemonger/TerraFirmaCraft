@@ -31,7 +31,7 @@ public enum Lifecycle implements StringRepresentable
         {
             return other;
         }
-        if (other.ordinal() > this.ordinal() && this == FLOWERING && Math.random() > 0.9f)
+        if (other.ordinal() > this.ordinal() && this == FLOWERING)
         {
             return VALUES[this.ordinal() + 1];
         }
