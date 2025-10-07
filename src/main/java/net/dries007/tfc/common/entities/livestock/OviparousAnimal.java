@@ -100,51 +100,6 @@ public abstract class OviparousAnimal extends ProducingAnimal implements Pluckab
     /**
      * Allows high jumping {@link Rabbit#getJumpPower()}
      */
-    @Override
-    protected float getJumpPower()
-    {
-        if (!moveControl.hasWanted() || moveControl.getWantedY() <= getY() + 0.5D && moveControl.getSpeedModifier() > 1.1f)
-        {
-            return super.getJumpPower() * 1.2f;
-        }
-        return super.getJumpPower();
-    }
-
-    @Override
-    public void tickAnimalData()
-    {
-        if (getLastFamiliarityDecay() > -1 && getLastFamiliarityDecay() + 1 < getCalendar().getTotalDays() && !getEntity().level().isClientSide)
-        {
-            if(getAgeType() != Age.CHILD) {
-                addUses((int) (getCalendar().getTotalDays() - getLastFamiliarityDecay()));
-            }
-
-            // Decay must only occur on server, as the last familiarity decay is not synced, so this produces invalid results on client
-            float familiarity = getFamiliarity();
-            if (familiarity > 0f)
-            {
-                familiarity -= 0.02 * (getCalendar().getTotalDays() - getLastFamiliarityDecay());
-
-                if(familiarity < 0f)
-                    familiarity = 0f;
-
-                this.setFamiliarity(familiarity);
-            }
-            setLastFamiliarityDecay(getCalendar().getTotalDays());
-        }
-        final Age age = getAgeType();
-        if (age != getLastAge())
-        {
-            setLastAge(age);
-            getEntity().refreshDimensions();
-        }
-        // because this is a random value it's not deterministic, we will allow the entity to sync it on its own
-        if (!getEntity().level().isClientSide && age == Age.ADULT && getUses() > getUsesToElderly() && getOldDay() == -1L)
-        {
-            final long oldDay = getCalendar().getTotalDays();
-            setOldDay(oldDay);
-        }
-    }
 
     @Override
     protected void customServerAiStep()
@@ -187,7 +142,7 @@ public abstract class OviparousAnimal extends ProducingAnimal implements Pluckab
         return genes;
     }
 
-    private void applyGenes(CompoundTag tag, MammalProperties baby)
+    private void applyGenes(CompoundTag tag, OviparousAnimal baby)
     {
         baby.setGeneticSize(Mth.floor(EntityHelpers.getIntOrDefault(tag, "size", 16) / 2d + Mth.nextInt(baby.getEntity().getRandom(), -3, 3)));
         if (tag.getBoolean("runt"))
@@ -332,7 +287,7 @@ public abstract class OviparousAnimal extends ProducingAnimal implements Pluckab
                     baby.setFamiliarity(getFamiliarity());
                     if (getGenes() != null)
                     {
-                        applyGenes(getGenes(), (MammalProperties) baby);
+                        applyGenes(getGenes(), baby);
                     }
                     egg.setFertilized(baby, Calendars.SERVER.getTotalDays() + hatchDays.get());
                 }
