@@ -10,6 +10,7 @@ import java.util.Locale;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import net.dries007.tfc.common.TFCTags;
 import net.minecraft.Util;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -28,11 +29,7 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.AgeableMob;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -134,14 +131,19 @@ public interface TFCAnimalProperties extends GenderedRenderAnimal, BrainBreeder 
 
         long daysUnticked = getCalendar().getTotalDays() - getLastFamiliarityDecay();
 
-        if (getLastFamiliarityDecay() > -1 && getLastFamiliarityDecay() + 1 < getCalendar().getTotalDays() && !getEntity().level().isClientSide) {
-            if (getAgeType() != Age.CHILD) {
-                addUses((int) (daysUnticked));
-            }
+        if (getAgeType() != Age.CHILD) {
+            addUses((int) (daysUnticked));
+        }
 
+        if (getLastFamiliarityDecay() > -1 && getLastFamiliarityDecay() + 1 < getCalendar().getTotalDays() && !getEntity().level().isClientSide) {
 
             // Decay must only occur on server, as the last familiarity decay is not synced, so this produces invalid results on client
             float familiarity = getFamiliarity();
+
+            if(getEntity() instanceof  Mob mob && getAgeType() != Age.CHILD && mob.getSpawnType() != MobSpawnType.CHUNK_GENERATION && familiarity <= 0f){
+                    addUses((int) (daysUnticked) * 3);
+            }
+
             if (familiarity > 0f) {
                 familiarity -= 0.02 * (daysUnticked);
 
@@ -172,7 +174,7 @@ public interface TFCAnimalProperties extends GenderedRenderAnimal, BrainBreeder 
             if (newDaysTillDie > 0) {
                 setDaysTillDie(newDaysTillDie);
             } else {
-                getEntity().hurt(getEntity().level().damageSources().generic(), 1000);
+                getEntity().hurt(getEntity().level().damageSources().cramming(), 1000);
             }
         }
     }
@@ -226,7 +228,7 @@ public interface TFCAnimalProperties extends GenderedRenderAnimal, BrainBreeder 
                 }
                 stack.shrink(1);
             }
-            if (getAgeType() == Age.CHILD || getFamiliarity() < getAdultFamiliarityCap()) {
+            if (getAgeType() == Age.CHILD || getFamiliarity() < getAdultFamiliarityCap() && stack.getTags().noneMatch(tag-> tag == TFCTags.Items.SMALL_LIVESTOCK_SUSTAIN_FOOD || tag == TFCTags.Items.LARGE_LIVESTOCK_SUSTAIN_FOOD)) {
                 float familiarity = getFamiliarity() + 0.04f;
                 if (getAgeType() != Age.CHILD) {
                     familiarity = Math.min(familiarity, getAdultFamiliarityCap());

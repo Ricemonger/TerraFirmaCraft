@@ -17,6 +17,8 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.Animal;
@@ -109,14 +111,19 @@ public interface HorseProperties extends MammalProperties {
 
         long daysUnticked = getCalendar().getTotalDays() - getLastFamiliarityDecay();
 
-        if (getLastFamiliarityDecay() > -1 && getLastFamiliarityDecay() + 1 < getCalendar().getTotalDays() && !getEntity().level().isClientSide) {
-            if (getAgeType() != Age.CHILD) {
-                addUses((int) (daysUnticked));
-            }
+        if (getAgeType() != Age.CHILD) {
+            addUses((int) (daysUnticked));
+        }
 
+        if (getLastFamiliarityDecay() > -1 && getLastFamiliarityDecay() + 1 < getCalendar().getTotalDays() && !getEntity().level().isClientSide) {
 
             // Decay must only occur on server, as the last familiarity decay is not synced, so this produces invalid results on client
             float familiarity = getFamiliarity();
+
+            if(getAgeType() != Age.CHILD && getEntity().getSpawnType() != MobSpawnType.CHUNK_GENERATION && familiarity <= 0f){
+                addUses((int) (daysUnticked) * 3);
+            }
+
             if (familiarity > 0f && familiarity < 0.5f) {
                 familiarity -= 0.02 * daysUnticked;
 
@@ -154,7 +161,7 @@ public interface HorseProperties extends MammalProperties {
             if (newDaysTillDie > 0) {
                 setDaysTillDie(newDaysTillDie);
             } else {
-                getEntity().hurt(getEntity().level().damageSources().generic(), 1000);
+                getEntity().hurt(getEntity().level().damageSources().cramming(), 1000);
             }
         }
 
