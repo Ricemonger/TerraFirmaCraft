@@ -111,11 +111,11 @@ public interface HorseProperties extends MammalProperties {
 
         long daysUnticked = getCalendar().getTotalDays() - getLastFamiliarityDecay();
 
-        if (getAgeType() != Age.CHILD) {
-            addUses((int) (daysUnticked));
-        }
-
         if (getLastFamiliarityDecay() > -1 && getLastFamiliarityDecay() + 1 < getCalendar().getTotalDays() && !getEntity().level().isClientSide) {
+
+            if (getAgeType() != Age.CHILD) {
+                addUses((int) (daysUnticked));
+            }
 
             // Decay must only occur on server, as the last familiarity decay is not synced, so this produces invalid results on client
             float familiarity = getFamiliarity();

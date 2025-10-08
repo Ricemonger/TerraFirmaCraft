@@ -131,11 +131,11 @@ public interface TFCAnimalProperties extends GenderedRenderAnimal, BrainBreeder 
 
         long daysUnticked = getCalendar().getTotalDays() - getLastFamiliarityDecay();
 
-        if (getAgeType() != Age.CHILD) {
-            addUses((int) (daysUnticked));
-        }
-
         if (getLastFamiliarityDecay() > -1 && getLastFamiliarityDecay() + 1 < getCalendar().getTotalDays() && !getEntity().level().isClientSide) {
+
+            if (getAgeType() != Age.CHILD) {
+                addUses((int) (daysUnticked));
+            }
 
             // Decay must only occur on server, as the last familiarity decay is not synced, so this produces invalid results on client
             float familiarity = getFamiliarity();
@@ -152,6 +152,7 @@ public interface TFCAnimalProperties extends GenderedRenderAnimal, BrainBreeder 
 
                 this.setFamiliarity(familiarity);
             }
+
             setLastFamiliarityDecay(getCalendar().getTotalDays());
         }
         final Age age = getAgeType();
@@ -228,7 +229,7 @@ public interface TFCAnimalProperties extends GenderedRenderAnimal, BrainBreeder 
                 }
                 stack.shrink(1);
             }
-            if (getAgeType() == Age.CHILD || getFamiliarity() < getAdultFamiliarityCap() && stack.getTags().noneMatch(tag-> tag == TFCTags.Items.SMALL_LIVESTOCK_SUSTAIN_FOOD || tag == TFCTags.Items.LARGE_LIVESTOCK_SUSTAIN_FOOD)) {
+            if ((getAgeType() == Age.CHILD || getFamiliarity() < getAdultFamiliarityCap()) && stack.getTags().noneMatch(tag-> tag == TFCTags.Items.SMALL_LIVESTOCK_SUSTAIN_FOOD || tag == TFCTags.Items.LARGE_LIVESTOCK_SUSTAIN_FOOD || tag == TFCTags.Items.MEAT_LIVESTOCK_SUSTAIN_FOOD)) {
                 float familiarity = getFamiliarity() + 0.04f;
                 if (getAgeType() != Age.CHILD) {
                     familiarity = Math.min(familiarity, getAdultFamiliarityCap());
