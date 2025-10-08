@@ -120,7 +120,7 @@ public interface HorseProperties extends MammalProperties {
             // Decay must only occur on server, as the last familiarity decay is not synced, so this produces invalid results on client
             float familiarity = getFamiliarity();
 
-            if(getAgeType() != Age.CHILD && getEntity().getSpawnType() != MobSpawnType.CHUNK_GENERATION && familiarity <= 0f){
+            if(getAgeType() != Age.CHILD && getEntity().getSpawnType() != MobSpawnType.CHUNK_GENERATION && (familiarity <= 0f || familiarity == 0.5f)){
                 addUses((int) (daysUnticked) * 3);
             }
 

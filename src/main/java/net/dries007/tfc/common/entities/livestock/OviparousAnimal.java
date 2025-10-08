@@ -15,9 +15,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.EntityDimensions;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.animal.Chicken;
@@ -100,6 +98,60 @@ public abstract class OviparousAnimal extends ProducingAnimal implements Pluckab
     /**
      * Allows high jumping {@link Rabbit#getJumpPower()}
      */
+
+    @Override
+    public void tickAnimalData() {
+
+        long daysUnticked = getCalendar().getTotalDays() - getLastFamiliarityDecay();
+
+        if (getLastFamiliarityDecay() > -1 && getLastFamiliarityDecay() + 1 < getCalendar().getTotalDays() && !getEntity().level().isClientSide) {
+
+            if (getAgeType() != Age.CHILD) {
+                addUses((int) (daysUnticked));
+            }
+
+            // Decay must only occur on server, as the last familiarity decay is not synced, so this produces invalid results on client
+            float familiarity = getFamiliarity();
+
+            if (getEntity() instanceof Mob mob && getAgeType() != Age.CHILD && mob.getSpawnType() != MobSpawnType.CHUNK_GENERATION && familiarity <= 0f) {
+                addUses((int) (daysUnticked) * 3);
+            }
+
+            if (familiarity > 0f) {
+                familiarity -= 0.02 * (daysUnticked);
+
+                if (familiarity < 0f)
+                    familiarity = 0f;
+
+                this.setFamiliarity(familiarity);
+            }
+
+            setLastFamiliarityDecay(getCalendar().getTotalDays());
+        }
+        final Age age = getAgeType();
+        if (age != getLastAge()) {
+            setLastAge(age);
+            getEntity().refreshDimensions();
+        }
+        // because this is a random value it's not deterministic, we will allow the entity to sync it on its own
+        if (!getEntity().level().isClientSide && age == Age.ADULT && getUses() > getUsesToElderly() && getOldDay() == -1L) {
+            final long oldDay = getCalendar().getTotalDays();
+            setOldDay(oldDay);
+        }
+
+        long daysTillDie = getDaysTillDie();
+
+        if (age == Age.OLD && daysTillDie == -1) {
+            setDaysTillDie(Mth.nextInt(getEntity().level().getRandom(), 10, 30));
+        } else if (age == Age.OLD && daysTillDie >= 0) {
+            long newDaysTillDie = daysTillDie - daysUnticked;
+            if (newDaysTillDie > 0) {
+                setDaysTillDie(newDaysTillDie);
+            } else {
+                getEntity().hurt(getEntity().level().damageSources().cramming(), 1000);
+            }
+        }
+    }
 
     @Override
     protected void customServerAiStep()

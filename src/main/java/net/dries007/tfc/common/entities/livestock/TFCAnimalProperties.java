@@ -140,8 +140,8 @@ public interface TFCAnimalProperties extends GenderedRenderAnimal, BrainBreeder 
             // Decay must only occur on server, as the last familiarity decay is not synced, so this produces invalid results on client
             float familiarity = getFamiliarity();
 
-            if(getEntity() instanceof  Mob mob && getAgeType() != Age.CHILD && mob.getSpawnType() != MobSpawnType.CHUNK_GENERATION && familiarity <= 0f){
-                    addUses((int) (daysUnticked) * 3);
+            if (getEntity() instanceof Mob mob && getAgeType() != Age.CHILD && mob.getSpawnType() != MobSpawnType.CHUNK_GENERATION && familiarity <= 0f) {
+                addUses((int) (daysUnticked) * 3);
             }
 
             if (familiarity > 0f) {
@@ -216,8 +216,7 @@ public interface TFCAnimalProperties extends GenderedRenderAnimal, BrainBreeder 
         entity.heal(1f);
         if (!level.isClientSide) {
             final long days = getCalendar().getTotalDays();
-            setLastFed(days);
-            setLastFamiliarityDecay(days); // no decay today
+            setLastFed(days);// no decay today
             if (!player.isCreative()) {
                 stack.getCapability(FoodCapability.CAPABILITY).ifPresent(cap -> {
                     if (cap instanceof DynamicBowlHandler bowl) {
@@ -229,16 +228,28 @@ public interface TFCAnimalProperties extends GenderedRenderAnimal, BrainBreeder 
                 }
                 stack.shrink(1);
             }
-            if ((getAgeType() == Age.CHILD || getFamiliarity() < getAdultFamiliarityCap()) && stack.getTags().noneMatch(tag-> tag == TFCTags.Items.SMALL_LIVESTOCK_SUSTAIN_FOOD || tag == TFCTags.Items.LARGE_LIVESTOCK_SUSTAIN_FOOD || tag == TFCTags.Items.MEAT_LIVESTOCK_SUSTAIN_FOOD)) {
-                float familiarity = getFamiliarity() + 0.04f;
-                if (getAgeType() != Age.CHILD) {
-                    familiarity = Math.min(familiarity, getAdultFamiliarityCap());
+            if (stack.getTags().noneMatch(tag -> tag == TFCTags.Items.SMALL_LIVESTOCK_SUSTAIN_FOOD || tag == TFCTags.Items.LARGE_LIVESTOCK_SUSTAIN_FOOD || tag == TFCTags.Items.MEAT_LIVESTOCK_SUSTAIN_FOOD)) {
+                setLastFamiliarityDecay(days);
+                if ((getAgeType() == Age.CHILD || getFamiliarity() < getAdultFamiliarityCap())) {
+                    float familiarity = getFamiliarity() + 0.04f;
+                    if (getAgeType() != Age.CHILD) {
+                        familiarity = Math.min(familiarity, getAdultFamiliarityCap());
+                    }
+                    setFamiliarity(familiarity);
+                    if (player instanceof ServerPlayer serverPlayer) {
+                        TFCAdvancements.FED_ANIMAL.trigger(serverPlayer, entity);
+                    }
                 }
-                setFamiliarity(familiarity);
-                if (player instanceof ServerPlayer serverPlayer) {
-                    TFCAdvancements.FED_ANIMAL.trigger(serverPlayer, entity);
+            } else {
+                if ((getAgeType() == Age.CHILD || getFamiliarity() < getAdultFamiliarityCap())) {
+                    float familiarity = getFamiliarity() + 0.01f;
+                    if (getAgeType() != Age.CHILD) {
+                        familiarity = Math.min(familiarity, getAdultFamiliarityCap());
+                    }
+                    setFamiliarity(familiarity);
                 }
             }
+
             entity.playSound(eatingSound(stack), 1f, 1f);
         }
         return InteractionResult.SUCCESS;
@@ -296,6 +307,7 @@ public interface TFCAnimalProperties extends GenderedRenderAnimal, BrainBreeder 
         setBirthDay(EntityHelpers.getRandomGrowth(getEntity(), random, getDaysToAdulthood()));
         setFamiliarity(0);
         setOldDay(-1L);
+        setDaysTillDie(-1L);
         setUses((int) (getUsesToElderly() * random.nextDouble() * random.nextDouble()));
         setGeneticSize(Mth.nextInt(random, 4, 18));
         setFertilized(false);
