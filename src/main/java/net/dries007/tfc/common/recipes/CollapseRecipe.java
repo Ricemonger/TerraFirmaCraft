@@ -209,7 +209,7 @@ public class CollapseRecipe extends SimpleBlockRecipe
     {
         final BlockInventory wrapper = new BlockInventory(pos, state);
         final CollapseRecipe recipe = getRecipe(level, wrapper);
-        if (recipe != null)
+        if (recipe != null && (!Support.isSupported(level,pos) || Math.random() > 0.95))
         {
             final BlockPos posBelow = pos.below();
             if (destroyBlockBelow && !TFCFallingBlockEntity.canFallThrough(level, posBelow, Direction.DOWN, Blocks.BEDROCK.defaultBlockState()))
