@@ -84,8 +84,8 @@ public class SoupPotRecipe extends PotRecipe
         }
         if (ingredientCount > 0)
         {
-            float multiplier = 1 - (0.05f * ingredientCount); // per-serving multiplier of nutrition
-            water *= multiplier; saturation *= multiplier;
+            float multiplier = 0.5f; // per-serving multiplier of nutrition
+            water *= multiplier; saturation *= 0.33f;
             Nutrient maxNutrient = Nutrient.GRAIN; // determines what item you get. this is a default
             float maxNutrientValue = 0;
             for (Nutrient nutrient : Nutrient.VALUES)
@@ -98,7 +98,7 @@ public class SoupPotRecipe extends PotRecipe
                     maxNutrient = nutrient;
                 }
             }
-            int servings = (int) (ingredientCount / 2f) + 1;
+            int servings = 3;
             long created = FoodCapability.getRoundedCreationDate();
             FoodData data = FoodData.create((int) Math.ceil((float) foodValue / servings), water, saturation, nutrition, SOUP_DECAY_MODIFIER);
 
