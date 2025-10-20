@@ -10,7 +10,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
 
+import net.dries007.tfc.common.blockentities.BerryBushBlockEntity;
 import net.dries007.tfc.config.TFCConfig;
+import net.dries007.tfc.util.calendar.Calendars;
+import net.dries007.tfc.util.climate.Climate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -67,6 +70,82 @@ public class SpreadingBushBlock extends StationaryBerryBushBlock implements IFor
     public Block getCane()
     {
         return companion.get();
+    }
+
+    @Override
+    public void onUpdate(Level level, BlockPos pos, BlockState state)
+    {
+        if (level.getBlockEntity(pos) instanceof BerryBushBlockEntity bush)
+        {
+            Lifecycle currentLifecycle = state.getValue(LIFECYCLE);
+            Lifecycle expectedLifecycle = getLifecycleForCurrentMonth();
+            // if we are not working with a plant that is or should be dormant
+            if (!checkAndSetDormant(level, pos, state, currentLifecycle, expectedLifecycle))
+            {
+                // Otherwise, we do a month-by-month evaluation of how the bush should have grown.
+                // We only do this up to a year. Why? Because eventually, it will have become dormant, and any 'progress' during that year would've been lost anyway because it would unconditionally become dormant.
+                long deltaTicks = Math.min(bush.getTicksSinceBushUpdate(), Calendars.SERVER.getCalendarTicksInYear());
+                long currentCalendarTick = Calendars.SERVER.getCalendarTicks();
+                long nextCalendarTick = currentCalendarTick - deltaTicks;
+
+                final BlockPos sourcePos = pos.below();
+                final ClimateRange range = climateRange.get();
+                final int hydration = getHydration(level, sourcePos, state);
+
+                int monthsSpentDying = 0;
+                do
+                {
+                    // This always runs at least once. It is called through random ticks, and calendar updates - although calendar updates will only call this if they've waited at least a day, or the average delta between random ticks.
+                    // Otherwise it will just wait for the next random tick.
+
+                    // Jump forward to nextTick.
+                    // Advance both the stage (randomly, if the previous month was healthy), and lifecycle (if the at-the-time conditions were valid)
+                    nextCalendarTick = Math.min(nextCalendarTick + Calendars.SERVER.getCalendarTicksInMonth(), currentCalendarTick);
+
+
+                    float temperatureAtNextTick = Climate.getTemperature(level, pos, nextCalendarTick, Calendars.SERVER.getCalendarDaysInMonth());
+                    Lifecycle lifecycleAtNextTick = getLifecycleForMonth(ICalendar.getMonthOfYear(nextCalendarTick, Calendars.SERVER.getCalendarDaysInMonth()));
+                    if (range.checkBoth(hydration, temperatureAtNextTick, false))
+                    {
+                        if(currentLifecycle == Lifecycle.FLOWERING && Math.random() > 0.8f){
+                            currentLifecycle = currentLifecycle.advanceTowards(lifecycleAtNextTick);
+                        }
+                    }
+                    else
+                    {
+                        currentLifecycle = Lifecycle.DORMANT;
+                    }
+
+                    if (lifecycleAtNextTick != Lifecycle.DORMANT && currentLifecycle == Lifecycle.DORMANT)
+                    {
+                        monthsSpentDying++; // consecutive months spent where the conditions were invalid, but they shouldn't've been
+                    }
+                    else
+                    {
+                        monthsSpentDying = 0;
+                    }
+
+                } while (nextCalendarTick < currentCalendarTick);
+
+                BlockState newState;
+
+                if (mayDie(level, pos, state, monthsSpentDying))
+                {
+                    newState = getDeadState(state);
+                }
+                else
+                {
+                    // It's not dead! Now, perform the actual update over the time taken.
+                    newState = growAndPropagate(level, pos, level.getRandom(), state.setValue(LIFECYCLE, currentLifecycle));
+                }
+
+                // And update the block
+                if (state != newState)
+                {
+                    level.setBlock(pos, newState, 3);
+                }
+            }
+        }
     }
 
     @Override

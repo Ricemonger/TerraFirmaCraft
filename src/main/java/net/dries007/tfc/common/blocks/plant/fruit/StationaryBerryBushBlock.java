@@ -114,7 +114,7 @@ public class StationaryBerryBushBlock extends SeasonalPlantBlock implements HoeO
                     Lifecycle lifecycleAtNextTick = getLifecycleForMonth(ICalendar.getMonthOfYear(nextCalendarTick, Calendars.SERVER.getCalendarDaysInMonth()));
                     if (range.checkBoth(hydration, temperatureAtNextTick, false))
                     {
-                        if(currentLifecycle == Lifecycle.FLOWERING&& Math.random() > 0.5f){
+                        if(currentLifecycle == Lifecycle.FLOWERING && Math.random() > 0.5f){
                             currentLifecycle = currentLifecycle.advanceTowards(lifecycleAtNextTick);
                         }
                     }
