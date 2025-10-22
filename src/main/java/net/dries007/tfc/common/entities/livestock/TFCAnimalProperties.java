@@ -71,7 +71,7 @@ public interface TFCAnimalProperties extends GenderedRenderAnimal, BrainBreeder 
         if (getUsesToElderly() > 0) {
             final float leftUses = 1f - getUses() / getUsesToElderly();
             // 0 -> 60% uses left scaled to 1 -> sqrt(2) size multiplier
-            ageScale = (float) Mth.clampedMap(leftUses, 0f, 0.60f, 0f, Math.sqrt(2));
+            ageScale = (float) Mth.clampedMap(leftUses, 0f, 0.60f, 1f, Math.sqrt(2));
         }
 
         //max 80f
