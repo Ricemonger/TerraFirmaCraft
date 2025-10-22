@@ -28,7 +28,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -43,7 +42,6 @@ import net.dries007.tfc.common.capabilities.food.FoodCapability;
 import net.dries007.tfc.common.entities.BrainBreeder;
 import net.dries007.tfc.common.entities.EntityHelpers;
 import net.dries007.tfc.common.entities.GenderedRenderAnimal;
-import net.dries007.tfc.config.TFCConfig;
 import net.dries007.tfc.config.animals.AnimalConfig;
 import net.dries007.tfc.util.Helpers;
 import net.dries007.tfc.util.advancements.TFCAdvancements;
@@ -54,12 +52,31 @@ public interface TFCAnimalProperties extends GenderedRenderAnimal, BrainBreeder 
     long MATING_COOLDOWN_DEFAULT_TICKS = ICalendar.TICKS_IN_DAY;
     float READY_TO_MATE_FAMILIARITY = 0.2f;
     float[] AGE_SCALES = Util.make(() -> {
-        final float[] scales = new float[32];
+        final float[] scales = new float[80];
         for (int i = 0; i < scales.length; i++) {
-            scales[i] = Mth.map(i + 1, 1, 32, 0.8f, 1.2f);
+            scales[i] = Mth.map(i + 1, 1, 80, 0.5f, 1.5f);
         }
         return scales;
     });
+
+    default float getAdjustedSize() {
+        // 9 - 40 by genetic size
+        float geneticSizeScale = 8 + getGeneticSize();
+
+        // 0 -> 0.32 familiarity scaled to 1 -> sqrt(2) size multiplier
+        final float familiarityScale = (float) Mth.clampedMap(getFamiliarity(), 0f, 0.32f, 1f, Math.sqrt(2));
+
+        float ageScale = 1f;
+
+        if (getUsesToElderly() > 0) {
+            final float leftUses = 1f - getUses() / getUsesToElderly();
+            // 0 -> 60% uses left scaled to 1 -> sqrt(2) size multiplier
+            ageScale = (float) Mth.clampedMap(leftUses, 0f, 0.60f, 0f, Math.sqrt(2));
+        }
+
+        //max 80f
+        return geneticSizeScale * familiarityScale * ageScale;
+    }
 
     default LivingEntity getEntity() {
         return (LivingEntity) this;
@@ -398,7 +415,7 @@ public interface TFCAnimalProperties extends GenderedRenderAnimal, BrainBreeder 
     }
 
     default float getAgeScale() {
-        return AGE_SCALES[getGeneticSize() - 1];
+        return AGE_SCALES[(int)getAdjustedSize() - 1];
     }
 
     /**
