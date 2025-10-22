@@ -9,6 +9,7 @@ package net.dries007.tfc.common.capabilities.food;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.function.ToDoubleFunction;
+
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -22,8 +23,7 @@ import net.dries007.tfc.config.TFCConfig;
  * <p>
  * This only executes logic on server side, on client side it simply sets the lastAverageNutrients
  */
-public class NutritionData
-{
+public class NutritionData {
     private final LinkedList<FoodData> records;
     private final float defaultNutritionValue, defaultDairyNutritionValue;
     private final float[] nutrients;
@@ -31,8 +31,7 @@ public class NutritionData
     private int hungerWindow;
     private int hunger;
 
-    public NutritionData(float defaultNutritionValue, float defaultDairyNutritionValue)
-    {
+    public NutritionData(float defaultNutritionValue, float defaultDairyNutritionValue) {
         this.records = new LinkedList<>();
         this.defaultNutritionValue = defaultNutritionValue;
         this.defaultDairyNutritionValue = defaultDairyNutritionValue;
@@ -43,8 +42,7 @@ public class NutritionData
         calculateNutrition();
     }
 
-    public void reset()
-    {
+    public void reset() {
         this.records.clear();
         calculateNutrition();
     }
@@ -53,35 +51,30 @@ public class NutritionData
      * Set the current {@code hunger} value of the player, in {@code [0, PlayerInfo.MAX_HUNGER]}. This may update
      * the nutrition of the player.
      */
-    public void setHunger(int hunger)
-    {
+    public void setHunger(int hunger) {
         this.hunger = hunger;
         calculateNutrition();
     }
 
-    public float getAverageNutrition()
-    {
+    public float getAverageNutrition() {
         return averageNutrients;
     }
 
     /**
      * @return The nutrient value, in [0, 1]
      */
-    public float getNutrient(Nutrient nutrient)
-    {
+    public float getNutrient(Nutrient nutrient) {
         return nutrients[nutrient.ordinal()];
     }
 
-    public float[] getNutrients()
-    {
+    public float[] getNutrients() {
         return nutrients;
     }
 
     /**
      * Sets data from a packet, received on client side. Does not contain the full data only the important information
      */
-    public void onClientUpdate(float[] nutrients)
-    {
+    public void onClientUpdate(float[] nutrients) {
         System.arraycopy(nutrients, 0, this.nutrients, 0, this.nutrients.length);
         updateAverageNutrients(); // Only need to update the average
     }
@@ -91,40 +84,47 @@ public class NutritionData
      * If the last meal you ate had hunger, and this one didn't have hunger, we will apply the meal
      * Use case: Milk drinking. We add milk as a meal if and only if you just ate something
      */
-    public void addNutrients(FoodData data)
-    {
-        if (data.hunger() > 0 || records.isEmpty() || records.getFirst().hunger() > 0)
-        {
+    public void addNutrients(FoodData data) {
+        if (data.hunger() > 0 || records.isEmpty()) {
             records.addFirst(data);
+            calculateNutrition();
+        } else if (data.hunger() == 0 && records.getFirst().hunger() > 0) {
+            FoodData oldData = records.removeFirst();
+            FoodData newData = new FoodData(
+                -1,
+                oldData.water() + data.water(),
+                oldData.saturation() + data.saturation(),
+                oldData.grain() + data.grain(),
+                oldData.fruit() + data.fruit(),
+                oldData.vegetables() + data.vegetables(),
+                oldData.protein() + data.protein(),
+                oldData.dairy() + data.dairy(),
+                oldData.decayModifier());
+            records.addFirst(newData);
             calculateNutrition();
         }
     }
 
-    public CompoundTag writeToNbt()
-    {
+    public CompoundTag writeToNbt() {
         CompoundTag nbt = new CompoundTag();
         ListTag recordsNbt = new ListTag();
-        for (FoodData data : records)
-        {
+        for (FoodData data : records) {
             recordsNbt.add(data.write());
         }
         nbt.put("records", recordsNbt);
         return nbt;
     }
 
-    public void readFromNbt(CompoundTag nbt)
-    {
+    public void readFromNbt(CompoundTag nbt) {
         records.clear();
         ListTag recordsNbt = nbt.getList("records", Tag.TAG_COMPOUND);
-        for (int i = 0; i < recordsNbt.size(); i++)
-        {
+        for (int i = 0; i < recordsNbt.size(); i++) {
             records.add(FoodData.read(recordsNbt.getCompound(i)));
         }
         calculateNutrition();
     }
 
-    private void calculateNutrition()
-    {
+    private void calculateNutrition() {
         // Reset
         Arrays.fill(this.nutrients, 0);
 
@@ -137,25 +137,18 @@ public class NutritionData
 
         // Reload from config
         hungerWindow = TFCConfig.SERVER.nutritionRotationHungerWindow.get();
-        for (int i = 0; i < records.size(); i++)
-        {
+        for (int i = 0; i < records.size(); i++) {
             FoodData record = records.get(i);
             int nextHunger = 4 + runningHungerTotal;
-            if (nextHunger <= this.hungerWindow)
-            {
+            if (nextHunger <= this.hungerWindow) {
                 // Add weighted nutrition, keep moving
                 updateAllNutrients(nutrients, j -> nutrients[j.ordinal()] + record.nutrient(j) * 4);
                 runningHungerTotal = nextHunger;
-            }
-            else
-            {
-                // Calculate overshoot, weight appropriately, and exit
-                float actualHunger = hungerWindow - runningHungerTotal;
-                updateAllNutrients(nutrients, j -> nutrients[j.ordinal()] + record.nutrient(j) * actualHunger);
+            } else {
+                updateAllNutrients(nutrients, j -> nutrients[j.ordinal()] + record.nutrient(j) * 4);
 
                 // Remove any excess elements, this has the side effect of exiting the loop
-                while (records.size() > i + 1)
-                {
+                while (records.size() > i + 1) {
                     records.remove(i + 1);
                 }
             }
@@ -163,17 +156,12 @@ public class NutritionData
 
         // Average over hunger window, using default value if beyond the hunger window
         updateAllNutrients(nutrients, j -> nutrients[j.ordinal()] / hungerWindow);
-        if (runningHungerTotal < hungerWindow)
-        {
+        if (runningHungerTotal < hungerWindow) {
             float defaultModifier = 1 - (float) runningHungerTotal / hungerWindow;
-            for (Nutrient nutrient : Nutrient.VALUES)
-            {
-                if (nutrient == Nutrient.DAIRY)
-                {
+            for (Nutrient nutrient : Nutrient.VALUES) {
+                if (nutrient == Nutrient.DAIRY) {
                     nutrients[nutrient.ordinal()] += defaultDairyNutritionValue * defaultModifier;
-                }
-                else
-                {
+                } else {
                     nutrients[nutrient.ordinal()] += defaultNutritionValue * defaultModifier;
                 }
             }
@@ -182,20 +170,16 @@ public class NutritionData
         updateAverageNutrients(); // Also calculate overall average
     }
 
-    private void updateAverageNutrients()
-    {
+    private void updateAverageNutrients() {
         averageNutrients = 0;
-        for (float nutrient : nutrients)
-        {
+        for (float nutrient : nutrients) {
             averageNutrients += nutrient;
         }
         averageNutrients /= Nutrient.TOTAL;
     }
 
-    private void updateAllNutrients(float[] array, ToDoubleFunction<Nutrient> operator)
-    {
-        for (Nutrient nutrient : Nutrient.VALUES)
-        {
+    private void updateAllNutrients(float[] array, ToDoubleFunction<Nutrient> operator) {
+        for (Nutrient nutrient : Nutrient.VALUES) {
             array[nutrient.ordinal()] = (float) operator.applyAsDouble(nutrient);
         }
     }
