@@ -8,6 +8,7 @@ package net.dries007.tfc.common.blocks.wood;
 
 import java.util.function.Supplier;
 
+import net.dries007.tfc.util.calendar.Calendars;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
@@ -67,7 +68,7 @@ public class TFCSaplingBlock extends SaplingBlock implements IForgeBlockExtensio
             }
             if (level.getBlockEntity(pos) instanceof TickCounterBlockEntity counter)
             {
-                if (counter.getTicksSinceUpdate() > ICalendar.TICKS_IN_DAY *  getDaysToGrow() * TFCConfig.SERVER.globalSaplingGrowthModifier.get())
+                if (counter.getTicksSinceUpdate() > Calendars.SERVER.getTicks() + ICalendar.TICKS_IN_DAY *  getDaysToGrow() * TFCConfig.SERVER.globalSaplingGrowthModifier.get())
                 {
                     this.advanceTree(level, pos, state.setValue(STAGE, 1), random);
                 }
