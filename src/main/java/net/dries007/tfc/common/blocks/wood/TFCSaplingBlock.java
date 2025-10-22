@@ -68,7 +68,7 @@ public class TFCSaplingBlock extends SaplingBlock implements IForgeBlockExtensio
             }
             if (level.getBlockEntity(pos) instanceof TickCounterBlockEntity counter)
             {
-                if (counter.getTicksSinceUpdate() > Calendars.SERVER.getTicks() + ICalendar.TICKS_IN_DAY *  getDaysToGrow() * TFCConfig.SERVER.globalSaplingGrowthModifier.get())
+                if (counter.getTicksSinceUpdate() >ICalendar.TICKS_IN_DAY *  getDaysToGrow() * TFCConfig.SERVER.globalSaplingGrowthModifier.get())
                 {
                     this.advanceTree(level, pos, state.setValue(STAGE, 1), random);
                 }
