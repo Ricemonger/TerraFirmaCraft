@@ -84,6 +84,16 @@ public class ServerConfig
     public final ForgeConfigSpec.BooleanValue crucibleEnableAutomation;
     // Blocks - Anvil
     public final ForgeConfigSpec.IntValue anvilAcceptableWorkRange;
+    // Negative / penalty grades
+    public final ForgeConfigSpec.DoubleValue anvilBotchedForgedThreshold;
+    public final ForgeConfigSpec.DoubleValue anvilShoddilyForgedThreshold;
+    public final ForgeConfigSpec.DoubleValue anvilPoorlyForgedThreshold;
+    public final ForgeConfigSpec.DoubleValue anvilRoughlyForgedThreshold;
+
+    // Neutral grade
+    public final ForgeConfigSpec.DoubleValue anvilPlainlyForgedThreshold;
+
+    // Positive / bonus grades
     public final ForgeConfigSpec.DoubleValue anvilModestlyForgedThreshold;
     public final ForgeConfigSpec.DoubleValue anvilWellForgedThreshold;
     public final ForgeConfigSpec.DoubleValue anvilExpertForgedThreshold;
@@ -383,6 +393,29 @@ public class ServerConfig
         builder.swap("anvil");
 
         anvilAcceptableWorkRange = builder.comment("The number of pixels that the anvil's result may be off by, but still count as recipe completion. By default this requires pixel perfect accuracy.").define("anvilAcceptableWorkRange", 0, 0, 150);
+        // Negative / penalty grades
+        anvilBotchedForgedThreshold = builder.comment(
+                "The maximum efficiency (ratio of number of steps taken / minimum number of steps required) that an item can have before it is no longer considered 'Botched'.")
+            .define("anvilBotchedForgedThreshold", Double.MAX_VALUE, 1.0, Double.MAX_VALUE);
+
+        anvilShoddilyForgedThreshold = builder.comment(
+                "The maximum efficiency (ratio of number of steps taken / minimum number of steps required) that an item can have before it is no longer considered 'Shoddily Forged'.")
+            .define("anvilShoddyForgedThreshold", 25.0, 1.0, Double.MAX_VALUE);
+
+        anvilPoorlyForgedThreshold = builder.comment(
+                "The maximum efficiency (ratio of number of steps taken / minimum number of steps required) that an item can have before it is no longer considered 'Poorly Forged'.")
+            .define("anvilPoorForgedThreshold", 15.0, 1.0, Double.MAX_VALUE);
+
+        anvilRoughlyForgedThreshold = builder.comment(
+                "The maximum efficiency (ratio of number of steps taken / minimum number of steps required) that an item can have before it is no longer considered 'Roughly Forged'.")
+            .define("anvilRoughForgedThreshold", 12.0, 1.0, Double.MAX_VALUE);
+
+// Neutral grade
+        anvilPlainlyForgedThreshold = builder.comment(
+                "The maximum efficiency (ratio of number of steps taken / minimum number of steps required) that an item can have before it is no longer considered 'Plain Forged' (neutral quality).")
+            .define("anvilPlainForgedThreshold", 10.0, 1.0, Double.MAX_VALUE);
+
+// Positive / bonus grades
         anvilModestlyForgedThreshold = builder.comment("The minimum efficiency (ratio of number of steps taken / minimum number of steps required) that must be passed for a item to be considered 'Modestly Forged'.").define("anvilModestlyForgedThreshold", 10.0, 1.0, Double.MAX_VALUE);
         anvilWellForgedThreshold = builder.comment("The minimum efficiency (ratio of number of steps taken / minimum number of steps required) that must be passed for a item to be considered 'Well Forged'.").define("anvilWellForgedThreshold", 5.0, 1.0, Double.MAX_VALUE);
         anvilExpertForgedThreshold = builder.comment("The minimum efficiency (ratio of number of steps taken / minimum number of steps required) that must be passed for a item to be considered 'Expertly Forged'.").define("anvilExpertForgedThreshold", 2.0, 1.0, Double.MAX_VALUE);
