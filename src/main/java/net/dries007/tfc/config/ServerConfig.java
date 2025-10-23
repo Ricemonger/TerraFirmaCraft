@@ -400,20 +400,20 @@ public class ServerConfig
 
         anvilShoddilyForgedThreshold = builder.comment(
                 "The maximum efficiency (ratio of number of steps taken / minimum number of steps required) that an item can have before it is no longer considered 'Shoddily Forged'.")
-            .define("anvilShoddyForgedThreshold", 25.0, 1.0, Double.MAX_VALUE);
+            .define("anvilShoddilyForgedThreshold", 25.0, 1.0, Double.MAX_VALUE);
 
         anvilPoorlyForgedThreshold = builder.comment(
                 "The maximum efficiency (ratio of number of steps taken / minimum number of steps required) that an item can have before it is no longer considered 'Poorly Forged'.")
-            .define("anvilPoorForgedThreshold", 15.0, 1.0, Double.MAX_VALUE);
+            .define("anvilPoorlyForgedThreshold", 15.0, 1.0, Double.MAX_VALUE);
 
         anvilRoughlyForgedThreshold = builder.comment(
                 "The maximum efficiency (ratio of number of steps taken / minimum number of steps required) that an item can have before it is no longer considered 'Roughly Forged'.")
-            .define("anvilRoughForgedThreshold", 12.0, 1.0, Double.MAX_VALUE);
+            .define("anvilRoughlyForgedThreshold", 12.0, 1.0, Double.MAX_VALUE);
 
 // Neutral grade
         anvilPlainlyForgedThreshold = builder.comment(
                 "The maximum efficiency (ratio of number of steps taken / minimum number of steps required) that an item can have before it is no longer considered 'Plain Forged' (neutral quality).")
-            .define("anvilPlainForgedThreshold", 10.0, 1.0, Double.MAX_VALUE);
+            .define("anvilPlainlyForgedThreshold", 10.0, 1.0, Double.MAX_VALUE);
 
 // Positive / bonus grades
         anvilModestlyForgedThreshold = builder.comment("The minimum efficiency (ratio of number of steps taken / minimum number of steps required) that must be passed for a item to be considered 'Modestly Forged'.").define("anvilModestlyForgedThreshold", 10.0, 1.0, Double.MAX_VALUE);
