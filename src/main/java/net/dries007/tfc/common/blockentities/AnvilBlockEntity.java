@@ -289,7 +289,15 @@ public class AnvilBlockEntity extends InventoryBlockEntity<AnvilBlockEntity.Anvi
                 }
 
                 // Proceed with working
-                forge.addStep(step);
+                int stepWork = step.step();
+                double chance = Math.random();
+                if (chance < 0.5 && chance >= 0.25) {
+                    stepWork++;
+                }
+                else if(chance < 0.25){
+                    stepWork--;
+                }
+                forge.addStep(step, stepWork);
 
                 // Damage the hammer
                 final InteractionHand breakingHand = hammerSlot;

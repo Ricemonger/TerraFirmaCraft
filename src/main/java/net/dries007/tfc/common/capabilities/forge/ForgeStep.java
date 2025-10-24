@@ -80,6 +80,10 @@ public enum ForgeStep {
     }
 
     public int step() {
+        return step;
+    }
+
+    public int randomStep(){
         double chance = Math.random();
         if (chance >= 0.5) {
             return step;
@@ -89,7 +93,6 @@ public enum ForgeStep {
         }
         else {
             return step - 1;
-
         }
     }
 
