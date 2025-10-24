@@ -18,6 +18,11 @@ public enum CopyForgingBonusModifier implements ItemStackModifier.SingleInstance
     public ItemStack apply(ItemStack stack, ItemStack input)
     {
         ForgingBonus.set(stack, ForgingBonus.get(input));
+
+        if(stack.isDamageableItem() && ForgingBonus.get(stack).durability() < 0){
+            stack.setDamageValue((int)(stack.getMaxDamage() * -ForgingBonus.get(stack).durability()));
+        }
+
         return stack;
     }
 

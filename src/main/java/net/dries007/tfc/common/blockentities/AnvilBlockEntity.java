@@ -329,6 +329,10 @@ public class AnvilBlockEntity extends InventoryBlockEntity<AnvilBlockEntity.Anvi
                         final ForgingBonus bonus = ForgingBonus.byRatio(ratio);
                         ForgingBonus.set(outputStack, bonus);
 
+                        if(stack.isDamageableItem() && ForgingBonus.get(stack).durability() < 0){
+                            stack.setDamageValue((int)(stack.getMaxDamage() * -ForgingBonus.get(stack).durability()));
+                        }
+
                         if (bonus == ForgingBonus.PERFECTLY_FORGED)
                         {
                             TFCAdvancements.PERFECTLY_FORGED.trigger(player);
@@ -408,6 +412,11 @@ public class AnvilBlockEntity extends InventoryBlockEntity<AnvilBlockEntity.Anvi
                 {
                     // Recipe completed, so consume inputs and add outputs
                     final ItemStack outputStack = recipe.assemble(inventory, level.registryAccess());
+
+                    if(stack.isDamageableItem() && ForgingBonus.get(stack).durability() < 0){
+                        stack.setDamageValue((int)(stack.getMaxDamage() * -ForgingBonus.get(stack).durability()));
+                    }
+
                     final @Nullable IHeat outputHeat = HeatCapability.get(outputStack);
 
                     // Always preserve heat of the input
@@ -477,6 +486,11 @@ public class AnvilBlockEntity extends InventoryBlockEntity<AnvilBlockEntity.Anvi
             }
 
             final ItemStack result = recipe.assemble(inventory, level.registryAccess());
+
+            if(result.isDamageableItem() && ForgingBonus.get(result).durability() < 0){
+                result.setDamageValue((int)(result.getMaxDamage() * -ForgingBonus.get(result).durability()));
+            }
+
             final @Nullable IHeat resultHeat = HeatCapability.get(result);
 
             inventory.getStackInSlot(SLOT_INPUT_MAIN).shrink(1);

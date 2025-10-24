@@ -12,6 +12,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import com.google.gson.JsonObject;
+import net.dries007.tfc.common.capabilities.forge.ForgingBonus;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -174,6 +175,11 @@ public class HeatingRecipe implements ISimpleRecipe<ItemStackInventory>
         {
             outputFluid.setAmount(Mth.floor(outputFluid.getAmount() * (1 - (float) inputStack.getDamageValue() / inputStack.getMaxDamage())));
         }
+
+        if(!inputStack.isDamageableItem() && ForgingBonus.get(inputStack).durability() < 0){
+            outputFluid.setAmount((int)(outputFluid.getAmount() * (1f - ForgingBonus.get(inputStack).durability())));
+        }
+
         return outputFluid;
     }
 
