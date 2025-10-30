@@ -54,7 +54,7 @@ public interface TFCAnimalProperties extends GenderedRenderAnimal, BrainBreeder 
     float[] AGE_SCALES = Util.make(() -> {
         final float[] scales = new float[80];
         for (int i = 0; i < scales.length; i++) {
-            scales[i] = Mth.map(i + 1, 1, 80, 0.5f, 1.5f);
+            scales[i] = Mth.map(i + 1, 1, 80, 0.66f, 1.25f);
         }
         return scales;
     });
