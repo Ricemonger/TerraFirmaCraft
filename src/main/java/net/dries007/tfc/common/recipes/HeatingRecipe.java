@@ -177,7 +177,7 @@ public class HeatingRecipe implements ISimpleRecipe<ItemStackInventory>
         }
 
         if(!inputStack.isDamageableItem() && ForgingBonus.get(inputStack).durability() < 0){
-            outputFluid.setAmount((int)(outputFluid.getAmount() * (1f - ForgingBonus.get(inputStack).durability())));
+            outputFluid.setAmount((int)(outputFluid.getAmount() * (1f + ForgingBonus.get(inputStack).durability())));
         }
 
         return outputFluid;
