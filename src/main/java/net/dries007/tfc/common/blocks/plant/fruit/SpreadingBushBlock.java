@@ -108,7 +108,10 @@ public class SpreadingBushBlock extends StationaryBerryBushBlock implements IFor
                     if (range.checkBoth(hydration, temperatureAtNextTick, false))
                     {
                         if(currentLifecycle == Lifecycle.FLOWERING && Math.random() > 0.8f){
-                            currentLifecycle = currentLifecycle.advanceTowards(lifecycleAtNextTick);
+                            currentLifecycle = currentLifecycle.advanceTowards(expectedLifecycle);
+                        }
+                        else if(currentLifecycle != Lifecycle.FLOWERING){
+                            currentLifecycle = currentLifecycle.advanceTowards(expectedLifecycle);
                         }
                     }
                     else
