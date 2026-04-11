@@ -67,7 +67,9 @@ public class TFCCat extends TamableMammal
         super.createGenes(tag, male);
         if (male instanceof TFCCat maleCat)
         {
-            tag.putString("variant", random.nextBoolean() ? maleCat.getVariant().toString() : getVariant().toString());
+            final ResourceLocation variant = BuiltInRegistries.CAT_VARIANT.getKey(random.nextBoolean() ? maleCat.getVariant() : getVariant());
+            if (variant != null)
+                tag.putString("variant", variant.toString());
         }
     }
 

@@ -56,14 +56,15 @@ public abstract class DairyAnimal extends ProducingMammal
                     final FluidTank sourceFluidHandler = new FluidTank(Integer.MAX_VALUE);
                     sourceFluidHandler.setFluid(event.getFluidProduct());
 
-                    FluidHelpers.transferBetweenItemAndOther(held, destFluidItemHandler, sourceFluidHandler, destFluidItemHandler, sound -> {
+                    if (FluidHelpers.transferBetweenItemAndOther(held, destFluidItemHandler, sourceFluidHandler, destFluidItemHandler, sound -> {
                         player.playSound(SoundEvents.COW_MILK, 1.0f, 1.0f); // play a custom sound, not the bucket fill sound
-                    }, new FluidHelpers.AfterTransferWithPlayer(player, hand));
-
-                    setProductsCooldown();
-                    addUses(event.getUses());
-
-                    return InteractionResult.SUCCESS;
+                    }, new FluidHelpers.AfterTransferWithPlayer(player, hand)))
+                    {
+                        setProductsCooldown();
+                        addUses(event.getUses());
+                        return InteractionResult.SUCCESS;
+                    }
+                    return InteractionResult.PASS;
                 }
             }
             else

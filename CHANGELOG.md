@@ -1,7 +1,8 @@
 ### Changes
 
-- Fix issues with egg-laying AI
-- Fix some fluid ingredients not appearing in JEI (#3031)
-- Fix an issue where rock layer ordering is not preserved when recreating a world.
-- Updated the Japanese translation
-- Removed AlcatrazEscapee (#1)
+- Made some convenience updates to fluid transfer interactions.
+- Fix some issues with double crops (#3459)
+- Fix cat genetics not working (#3442)
+- Fix animals constantly running around forever (#3463, #3464, #2878)
+- Updated Polish translation.
+- Fix Krummholz not spawning

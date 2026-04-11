@@ -70,7 +70,7 @@ public class WildDoubleCropBlock extends WildCropBlock
         }
         else
         {
-            return Helpers.isBlock(belowState, state.getBlock()) && belowState.getValue(PART) == DoubleCropBlock.Part.BOTTOM;
+            return belowState.hasProperty(DoubleCropBlock.PART) && belowState.getValue(PART) == DoubleCropBlock.Part.BOTTOM;
         }
     }
 

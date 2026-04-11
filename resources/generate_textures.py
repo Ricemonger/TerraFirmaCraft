@@ -238,7 +238,7 @@ def create_hanging_sign_chains_item(metal: str, smooth_color):
 
 def create_magma(rock: str):
     magma = Image.new('RGBA', (16, 48), (0, 0, 0, 0))
-    raw = Image.open(templates + '/raw/%s.png' % rock)
+    raw = Image.open(path + 'block/rock/raw/%s.png' % rock)
     magma.paste(raw, (0, 0))
     magma.paste(raw, (0, 16))
     magma.paste(raw, (0, 32))

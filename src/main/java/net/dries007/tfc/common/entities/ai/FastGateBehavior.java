@@ -14,6 +14,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.behavior.Behavior;
 import net.minecraft.world.entity.ai.behavior.BehaviorControl;
 import net.minecraft.world.entity.ai.behavior.GateBehavior;
+import net.minecraft.world.entity.ai.memory.MemoryModuleType;
+import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -49,8 +51,17 @@ public class FastGateBehavior<E extends LivingEntity> implements BehaviorControl
     @Override
     public boolean tryStart(ServerLevel level, E entity, long gameTime)
     {
+        if (entity.getBrain().checkMemory(MemoryModuleType.WALK_TARGET, MemoryStatus.VALUE_PRESENT))
+        {
+            return false;
+        }
         current = behaviors.get(entity.getRandom().nextInt(behaviors.size()));
-        return current.tryStart(level, entity, gameTime);
+        if (current.tryStart(level, entity, gameTime))
+        {
+            status = Behavior.Status.RUNNING;
+            return true;
+        }
+        return false;
     }
 
     @Override
