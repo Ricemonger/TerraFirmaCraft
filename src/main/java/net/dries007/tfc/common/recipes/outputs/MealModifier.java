@@ -105,7 +105,7 @@ public record MealModifier(FoodData baseFood, List<MealPortion> portions) implem
                     foodHunger = 4;
                 }
 
-                hunger += data.hunger() * portion.hungerModifier * item.getCount();
+                hunger += foodHunger * portion.hungerModifier * item.getCount();
                 water += data.water() * portion.waterModifier * item.getCount();
                 saturation += data.saturation() * portion.saturationModifier * item.getCount();
             }
