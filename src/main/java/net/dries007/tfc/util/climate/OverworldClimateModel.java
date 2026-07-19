@@ -21,7 +21,6 @@ import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.SnowyDirtBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -31,9 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 import net.dries007.tfc.common.TFCTags;
 import net.dries007.tfc.common.blocks.IcePileBlock;
-import net.dries007.tfc.common.blocks.SnowPileBlock;
 import net.dries007.tfc.common.blocks.TFCBlocks;
-import net.dries007.tfc.common.blocks.plant.KrummholzBlock;
 import net.dries007.tfc.common.fluids.TFCFluids;
 import net.dries007.tfc.config.TFCConfig;
 import net.dries007.tfc.util.EnvironmentHelpers;
@@ -125,7 +122,6 @@ public class OverworldClimateModel implements WorldGenClimateModel
     private float temperatureScale = 20_000f;
 
     // For world generation climate
-    private Noise2D snowPatchNoise = (x, z) -> 0;
     private Noise2D icePatchNoise = (x, z) -> 0;
 
     /**
@@ -260,46 +256,17 @@ public class OverworldClimateModel implements WorldGenClimateModel
 
         final ChunkPos chunkPos = chunk.getPos();
         final BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
-        final BlockState snowState = Blocks.SNOW.defaultBlockState();
-
         for (int x = chunkPos.getMinBlockX(); x <= chunkPos.getMaxBlockX(); x++)
         {
             for (int z = chunkPos.getMinBlockZ(); z <= chunkPos.getMaxBlockZ(); z++)
             {
                 mutablePos.set(x, level.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z), z);
 
-                final float noise = (float) snowPatchNoise.noise(x, z);
                 final float temperature = getTemperature(null, mutablePos, chunkData, Calendars.SERVER.getCalendarTicks(), Calendars.SERVER.getCalendarDaysInMonth());
-                final float snowTemperatureModifier = Mth.clampedMap(temperature, -10f, 2f, -1, 1);
-
-                // Handle snow
-                BlockState stateAt = level.getBlockState(mutablePos);
-                if (snowTemperatureModifier + noise < 0 && level.getBrightness(LightLayer.BLOCK, mutablePos) <= 11)
-                {
-                    // Snow
-                    if (stateAt.isAir() && snowState.canSurvive(level, mutablePos))
-                    {
-                        // Place snow
-                        level.setBlock(mutablePos, Blocks.SNOW.defaultBlockState(), 2);
-                        mutablePos.move(Direction.DOWN);
-                        level.setBlock(mutablePos, Helpers.setProperty(level.getBlockState(mutablePos), SnowyDirtBlock.SNOWY, true), 2);
-                        mutablePos.move(Direction.UP);
-                    }
-                    else if (SnowPileBlock.canPlaceSnowPile(level, mutablePos, stateAt))
-                    {
-                        SnowPileBlock.placeSnowPile(level, mutablePos, stateAt, false);
-                        level.setBlock(mutablePos, Helpers.setProperty(level.getBlockState(mutablePos), SnowyDirtBlock.SNOWY, true), 2);
-                    }
-                    else if (stateAt.getBlock() instanceof KrummholzBlock)
-                    {
-                        KrummholzBlock.updateFreezingInColumn(level, mutablePos, true);
-                    }
-                }
-
 
                 // Handle ice
                 mutablePos.move(Direction.DOWN);
-                stateAt = level.getBlockState(mutablePos);
+                final BlockState stateAt = level.getBlockState(mutablePos);
 
                 if (EnvironmentHelpers.isWater(stateAt) || EnvironmentHelpers.isIce(stateAt))
                 {
@@ -367,7 +334,6 @@ public class OverworldClimateModel implements WorldGenClimateModel
 
     protected void updateNoise()
     {
-        this.snowPatchNoise = new OpenSimplex2D(climateSeed + 72397489123L).octaves(2).spread(0.3f).scaled(-1, 1);
         this.icePatchNoise = new OpenSimplex2D(climateSeed + 192639412341L).octaves(3).spread(0.6f);
     }
 
