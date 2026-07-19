@@ -106,8 +106,11 @@ public abstract class OviparousAnimal extends ProducingAnimal implements Pluckab
 
         if (getLastFamiliarityDecay() > -1 && getLastFamiliarityDecay() + 1 < getCalendar().getTotalDays() && !getEntity().level().isClientSide) {
 
-            if (getAgeType() != Age.CHILD) {
+            if (getEntity() instanceof Mob mob && getAgeType() != Age.CHILD && mob.getSpawnType() != MobSpawnType.CHUNK_GENERATION) {
                 addUses((int) (daysUnticked));
+            }
+            else if (getEntity() instanceof Mob mob && getAgeType() != Age.CHILD && mob.getSpawnType() == MobSpawnType.CHUNK_GENERATION) {
+                addUses(1);
             }
 
             // Decay must only occur on server, as the last familiarity decay is not synced, so this produces invalid results on client
