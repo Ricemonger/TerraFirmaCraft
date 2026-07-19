@@ -150,7 +150,7 @@ public class FruitTreeSaplingBlock extends BushBlock implements IForgeBlockExten
                     final float temp = Climate.getAverageTemperature(level, pos);
                     if (!climateRange.get().checkBoth(hydration, temp, false))
                     {
-                        level.setBlockAndUpdate(pos, TFCBlocks.PLANTS.get(Plant.DEAD_BUSH).get().defaultBlockState());
+                       // level.setBlockAndUpdate(pos, TFCBlocks.PLANTS.get(Plant.DEAD_BUSH).get().defaultBlockState());
                     }
                     else
                     {
